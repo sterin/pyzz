@@ -1,0 +1,11 @@
+out/
+build/
+
+.idea/
+
+*.pyc
+*.pyo
+
+*.egg-info
+
+pyzz/_pyzz.so
