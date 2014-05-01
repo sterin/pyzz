@@ -3,7 +3,6 @@ from _pyzz import *
 import sys
 import time
 import random
-from unionfind import union_find as union_find_raw
 
 from contextlib import contextmanager
 
@@ -313,22 +312,6 @@ def simulate_assignment(S, N, signals):
             res[w] = v(w[0])&v(w[1])
     
     return res
-
-class union_find(object):
-    
-    def __init__(self, wires):
-        self.wires = wires
-        self.wtor = dict( (w,i) for i,w in enumerate(wires) )
-        self.u = union_find_raw(len(wires))
-        
-    def find(self, w):
-        return self.wires[ self.u.find(self.wtor[w]) ]
-        
-    def union(self, w1, w2):
-        self.u.union( self.wtor[w1], self.wtor[w2] )
-        
-    def same(self, w1, w2):
-        return w1==w2 or self.find(w1) == self.find(w2)
 
 def somepast(N, x):
     ff = N.add_Flop()
