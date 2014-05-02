@@ -8,13 +8,12 @@ config = 'release_i'
 
 class build_ext_subclass( build_ext ):
     def build_extensions(self):
-        args = ['../BUILD/zz_gdep_link'] + self.compiler.compiler_cxx[1:]
+        args = ['../../BUILD/zz_gdep_link'] + self.compiler.compiler_cxx[1:]
         self.compiler.compiler_cxx = args
         build_ext.build_extensions(self)
 
 libraries = [
-    "ZZ_Baruch", 
-    "pywrapper", 
+    "ZZ_pyzz.api", 
     "ZZ_Bip", 
     "ZZ_CnfMap", 
     "ZZ_AbcInterface", 
@@ -38,7 +37,7 @@ extra_link_args = ['-Wl,-whole-archive'] + [ '-l%s'%l for l in libraries ] + ['-
 with os.popen("uname -mrs", "r") as p:
     machine = p.readline().rstrip().replace(' ', '-')
 
-library_dirs = [ "../lib/%s/%s"%(machine, config) ]
+library_dirs = [ "../../lib/%s/%s"%(machine, config) ]
 
 ext = Extension(
     '_pyzz',
@@ -51,6 +50,6 @@ setup(
     name='pyzz',
     version='1.0',
     ext_modules=[ext],
-    py_modules=['pyzz', 'unionfind'],
+    py_modules=['pyzz'],
     cmdclass={'build_ext':build_ext_subclass}
     )
