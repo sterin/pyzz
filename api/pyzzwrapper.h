@@ -74,6 +74,8 @@ public:
     ref<PyObject> id();
     ref<PyObject> sign();
 
+    ZZ::Lit& val();
+
 public:
 
     ZZ::Lit l;
@@ -116,6 +118,8 @@ public:
     ref<PyObject> id();
     ref<PyObject> sign();
 
+    ZZ::Wire& val();
+
     void mp_ass_subscript(PyObject* key, PyObject* val);
     ref<PyObject> mp_subscript(PyObject* o);
     
@@ -135,6 +139,7 @@ public:
     typedef typename pytype::zztype zztype;
 
     typedef WMap<pytype> C;
+    typedef ZZ::WMap<zztype> ZC;
     typedef type_base_with_new<C> base;
 
     WMap()
@@ -201,7 +206,7 @@ public:
 
     ref<PyObject> mp_subscript(PyObject* pkey)
     {
-        pytype& key = pytype::ensure(pkey);
+        Wire& key = Wire::ensure(pkey);
 
         zztype val = wmap[+key.w] ^ key.w.sign();
 
@@ -215,15 +220,15 @@ public:
 
     void mp_ass_subscript(PyObject* pkey, PyObject* pval)
     {
-        pytype& key = pytype::ensure(pkey);
+        Wire& key = Wire::ensure(pkey);
         pytype& val = pytype::ensure(pval);
 
-        wmap( +key.w ) = val.w^key.w.sign();
+        wmap( +key.w ) = val.val()^key.w.sign();
     }
 
     int sq_contains(PyObject* pkey)
     {
-        pytype& key = pytype::ensure(pkey);
+        Wire& key = Wire::ensure(pkey);
 
         zztype val = wmap[key.w];
 
@@ -242,15 +247,15 @@ public:
             }
 
             Wire& key = Wire::ensure(Sequence_Fast_GET_ITEM(pair, 0));
-            Wire& val = Wire::ensure(Sequence_Fast_GET_ITEM(pair, 1));
+            pytype& val = pytype::ensure(Sequence_Fast_GET_ITEM(pair, 1));
 
-            wmap(+key.w) = key.w ^ val.w^key.w.sign();
+            wmap(+key.w) = key.w ^ val.val()^key.w.sign();
         }
     }
 
 public:
 
-    ZZ::WMap<zztype> wmap;
+    ZC wmap;
 };
 
 template<typename pytype>

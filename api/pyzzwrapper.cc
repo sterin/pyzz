@@ -121,6 +121,11 @@ Lit::sign()
     return Bool_FromLong( l.sign );
 }
 
+ZZ::Lit& Lit::val()
+{
+    return l;
+}
+
 Wire::Wire(ZZ::Wire ww) :
     w(ww)
 {
@@ -323,6 +328,11 @@ ref<PyObject>
 Wire::sign()
 {
     return Bool_FromLong( w.sign() );
+}
+
+ZZ::Wire& Wire::val()
+{
+    return w;
 }
 
 ref<PyObject>
@@ -1382,6 +1392,7 @@ init()
     Lit::initialize(mod);
     Wire::initialize(mod);
     WMap<Wire>::initialize(mod,"_pyzz.wwmap", "wwmap");
+    WMap<Lit>::initialize(mod,"_pyzz.wlmap", "wlmap");
     VecIterator<Wire>::initialize(mod, "_pyzz.witerator", "witerator");
     VecIterator<lbool_proxy>::initialize(mod, "_pyzz.lbooliterator", "lbooliterator");
     Netlist::initialize(mod);
