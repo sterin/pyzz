@@ -316,7 +316,7 @@ class Netlist :
 {
 public:
 
-    Netlist(bool strash=true);
+    Netlist(bool empty=false);
     ~Netlist();
 
     static void initialize(PyObject* module);
@@ -333,15 +333,30 @@ public:
     ref<PyObject> add_PO(PyObject* args);
     ref<PyObject> add_Flop(PyObject* args);
 
+    ref<PyObject> add_property(PyObject* o);
+    ref<PyObject> add_constraint(PyObject* o);
+    ref<PyObject> add_fair_property(PyObject* o);
+    ref<PyObject> add_fair_constraint(PyObject* o);
+
     ref<PyObject> n_PIs();
     ref<PyObject> n_POs();
     ref<PyObject> n_Flops();
     ref<PyObject> n_Ands();
 
+    ref<PyObject> n_properties();
+    ref<PyObject> n_constraints();
+    ref<PyObject> n_fair_properties();
+    ref<PyObject> n_fair_constraints();
+
     ref<PyObject> get_PIs();
     ref<PyObject> get_POs();
     ref<PyObject> get_Flops();
     ref<PyObject> get_Ands();
+
+    ref<PyObject> get_properties();
+    ref<PyObject> get_constraints();
+    ref<PyObject> get_fair_properties();
+    ref<PyObject> get_fair_constraints();
 
     ref<PyObject> copy();
 
@@ -352,6 +367,10 @@ public:
 public:
 
     ZZ::Netlist N;
+
+private:
+
+    void assure_pobs();
 };
 
 class Solver :

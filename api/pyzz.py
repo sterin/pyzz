@@ -279,9 +279,17 @@ def arg_netlist(default):
         filename = sys.argv[1]
     
     N = netlist.read_aiger(filename)
-    N, _ = copy_coi(N)
+    N.remove_unreach()    
     
-    return N
+    symbols = { "PI_%d"%i:pi for i,pi in enumerate(N.get_PIs())}
+    symbols.update( {"Flop_%d"%i:pi for i,pi in enumerate(N.get_Flops()) })
+    symbols.update( {"P_%d"%i:pi for i,pi in enumerate(N.get_properties()) } )
+    symbols.update( {"C_%d"%i:pi for i,pi in enumerate(N.get_constraints()) } )
+    for i, ws in N.get_fair_properties():
+        symbols.update( {"FP_%d_%d"%(i,j):pi for j,pi in enumerate(N.get_properties()) } )
+    symbols.update( {"F_%d"%i:pi for i,pi in enumerate(N.get_fair_constraints()) } )
+    
+    return N, symbols
 
 def simulate_assignment(S, N, signals):
     

@@ -5,7 +5,7 @@ def bmc(N, max, symbols, filter=lambda sym: True, cex=True):
     U = unroll(N, init=True)
     S = solver(U.F)
     
-    po = disjunction( N, N.get_POs() )
+    po = disjunction( N, [ po[0] for po in N.get_properties()]  )
  
     for frame in xrange(max):
         
@@ -33,4 +33,7 @@ def bmc(N, max, symbols, filter=lambda sym: True, cex=True):
     return solver.l_Undef
 
 if __name__ == "__main__":
-    print bmc( arg_netlist("aiger/intel038.aig") , 40, {})
+    
+    N, symbols = arg_netlist("aiger/intel038.aig")
+
+    print bmc( N , 40, symbols)

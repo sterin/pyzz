@@ -357,14 +357,23 @@ Wire::tp_hash()
     return w.hash();
 }
 
-Netlist::Netlist(bool strash)
+void
+Netlist::assure_pobs()
 {
-    if (strash)
-    {
-        ZZ::Assure_Pob0(N, strash)
-    }
+    ZZ::Assure_Pob0(N, strash);
+    ZZ::Assure_Pob0(N, flop_init);
+    ZZ::Assure_Pob0(N, properties);
+    ZZ::Assure_Pob0(N, constraints);
+    ZZ::Assure_Pob0(N, fair_properties);
+    ZZ::Assure_Pob0(N, fair_constraints);
+}
 
-    ZZ::Add_Pob(N, flop_init);
+Netlist::Netlist(bool empty)
+{
+    if( ! empty )
+    {
+        assure_pobs();
+    }
 }
 
 Netlist::~Netlist()
@@ -388,15 +397,30 @@ Netlist::initialize(PyObject* module)
         PYTHONWRAPPER_METH_VARARGS( Netlist, add_PO, 0, ""),
         PYTHONWRAPPER_METH_VARARGS( Netlist, add_Flop, 0, ""),
 
+        PYTHONWRAPPER_METH_VARARGS( Netlist, add_property, 0, ""),
+        PYTHONWRAPPER_METH_VARARGS( Netlist, add_constraint, 0, ""),
+        PYTHONWRAPPER_METH_VARARGS( Netlist, add_fair_property, 0, ""),
+        PYTHONWRAPPER_METH_VARARGS( Netlist, add_fair_constraint, 0, ""),
+
         PYTHONWRAPPER_METH_NOARGS( Netlist, get_PIs, 0, ""),
         PYTHONWRAPPER_METH_NOARGS( Netlist, get_POs, 0, ""),
         PYTHONWRAPPER_METH_NOARGS( Netlist, get_Flops, 0, ""),
         PYTHONWRAPPER_METH_NOARGS( Netlist, get_Ands, 0, ""),
 
+        PYTHONWRAPPER_METH_NOARGS( Netlist, get_properties, 0, ""),
+        PYTHONWRAPPER_METH_NOARGS( Netlist, get_constraints, 0, ""),
+        PYTHONWRAPPER_METH_NOARGS( Netlist, get_fair_properties, 0, ""),
+        PYTHONWRAPPER_METH_NOARGS( Netlist, get_fair_constraints, 0, ""),
+
         PYTHONWRAPPER_METH_NOARGS( Netlist, n_PIs, 0, ""),
         PYTHONWRAPPER_METH_NOARGS( Netlist, n_POs, 0, ""),
         PYTHONWRAPPER_METH_NOARGS( Netlist, n_Flops, 0, ""),
         PYTHONWRAPPER_METH_NOARGS( Netlist, n_Ands, 0, ""),
+
+        PYTHONWRAPPER_METH_NOARGS( Netlist, n_properties, 0, ""),
+        PYTHONWRAPPER_METH_NOARGS( Netlist, n_constraints, 0, ""),
+        PYTHONWRAPPER_METH_NOARGS( Netlist, n_fair_properties, 0, ""),
+        PYTHONWRAPPER_METH_NOARGS( Netlist, n_fair_constraints, 0, ""),
 
         PYTHONWRAPPER_METH_NOARGS( Netlist, copy, 0, ""),
 
@@ -416,18 +440,18 @@ Netlist::initialize(PyObject* module)
 ref<PyObject>
 Netlist::read_aiger(PyObject* o)
 {
-    ref<Netlist> NN = Netlist::build(false);
+    ref<Netlist> NN = Netlist::build(true);
     ZZ::readAigerFile( String_AsString(o), NN->N);
-    ZZ::Assure_Pob0(NN->N, strash)
+    NN->assure_pobs();
     return NN;
 }
 
 ref<PyObject>
 Netlist::read(PyObject* o)
 {
-    ref<Netlist> NN = Netlist::build(false);
+    ref<Netlist> NN = Netlist::build(true);
     NN->N.read( String_AsString(o) );
-    ZZ::Assure_Pob0(NN->N, strash)
+    NN->assure_pobs();
     return NN;
 }
 
@@ -484,6 +508,44 @@ Netlist::add_Flop(PyObject* args)
     return Wire::build(ff);
 }
 
+ref<PyObject>
+Netlist::add_property(PyObject* o)
+{
+    Wire& w = Wire::ensure(o);
+
+    ZZ::Get_Pob(N, properties);
+    properties.push(w.w);
+}
+
+ref<PyObject>
+Netlist::add_constraint(PyObject* o)
+{
+    Wire& w = Wire::ensure(o);
+
+    ZZ::Get_Pob(N, constraints);
+    constraints.push(w.w);
+}
+
+
+ref<PyObject>
+Netlist::add_fair_property(PyObject* o)
+{
+    ZZ::Vec<ZZ::Wire> fcs;
+    zzvec_from_iter<Wire>(fcs, o);
+
+    ZZ::Get_Pob(N, fair_properties);
+    fair_properties.push();
+    fcs.copyTo(fair_properties.last());
+}
+
+ref<PyObject>
+Netlist::add_fair_constraint(PyObject* o)
+{
+    Wire& w = Wire::ensure(o);
+
+    ZZ::Get_Pob(N, fair_constraints);
+    fair_constraints.push(w.w);
+}
 void
 Netlist::remove_unreach()
 {
@@ -512,6 +574,35 @@ ref<PyObject>
 Netlist::n_Ands()
 {
     return Int_FromSize_t(N.typeCount(ZZ::gate_And));
+}
+
+
+ref<PyObject>
+Netlist::n_properties()
+{
+    ZZ::Get_Pob(N, properties);
+    return Int_FromLong( properties.size() );
+}
+
+ref<PyObject>
+Netlist::n_constraints()
+{
+    ZZ::Get_Pob(N, constraints);
+    return Int_FromLong( constraints.size() );
+}
+
+ref<PyObject>
+Netlist::n_fair_properties()
+{
+    ZZ::Get_Pob(N, fair_properties);
+    return Int_FromLong( fair_properties.size() );
+}
+
+ref<PyObject>
+Netlist::n_fair_constraints()
+{
+    ZZ::Get_Pob(N, fair_constraints);
+    return Int_FromLong( fair_constraints.size() );
 }
 
 ref<PyObject>
@@ -552,6 +643,58 @@ Netlist::get_Ands()
     fill_gates(vec, N, ZZ::gate_And);
 
     return VecIterator<Wire>::build(vec);
+}
+
+ref<PyObject>
+Netlist::get_properties()
+{
+    ZZ::Get_Pob(N, properties);
+
+    ZZ::Vec<ZZ::Wire> props;
+    properties.copyTo(props);
+
+    return VecIterator<Wire>::build(props);
+}
+
+
+ref<PyObject>
+Netlist::get_constraints()
+{
+    ZZ::Get_Pob(N, constraints);
+
+    ZZ::Vec<ZZ::Wire> props;
+    constraints.copyTo(props);
+
+    return VecIterator<Wire>::build(props);
+}
+
+ref<PyObject>
+Netlist::get_fair_properties()
+{
+    ZZ::Get_Pob(N, fair_properties);
+
+    ref<PyObject> list=List_New(fair_properties.size());
+
+    ZZ::Vec<ZZ::Wire> props;
+
+    for( uind i=0; i<fair_properties.size() ; i++)
+    {
+        fair_properties[i].copyTo(props);
+        List_SetItem(list, i, VecIterator<Wire>::build(props));
+    }
+
+    return list;
+}
+
+ref<PyObject>
+Netlist::get_fair_constraints()
+{
+    ZZ::Get_Pob(N, fair_constraints);
+
+    ZZ::Vec<ZZ::Wire> props;
+    fair_constraints.copyTo(props);
+
+    return VecIterator<Wire>::build(props);
 }
 
 ref<PyObject>
