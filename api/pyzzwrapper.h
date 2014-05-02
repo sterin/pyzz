@@ -258,6 +258,78 @@ public:
     ZC wmap;
 };
 
+class FlopInitMap :
+    public type_base<FlopInitMap>
+{
+public:
+
+    typedef FlopInitMap C;
+    typedef ZZ::Pec_LProp<ZZ::lbool,ZZ::gate_Flop> ZC;
+    typedef type_base<C> base;
+
+    FlopInitMap(ZC& m, borrowed_ref<PyObject> p) :
+        wmap(m),
+        _ref(p)
+    {
+    }
+
+    ~FlopInitMap()
+    {
+    }
+
+    static void initialize(PyObject* module, const char* mname, const char* name)
+    {
+        static PyMappingMethods as_mapping = { 0 };
+
+        as_mapping.mp_subscript = wrappers::binaryfunc<C, &C::mp_subscript>;
+        as_mapping.mp_ass_subscript = wrappers::mp_ass_subscript<C, &C::mp_ass_subscript>;
+
+        base::_type.tp_as_mapping = &as_mapping;
+
+        base::initialize(mname);
+        base::add_to_module(module, name);
+    }
+
+    static ZZ::Wire ensure_flop(PyObject* o)
+    {
+        Wire& key = Wire::ensure(o);
+
+        if( type(key.w) != ZZ::gate_Flop || key.w.sign() )
+        {
+            throw py::exception(PyExc_KeyError);
+        }
+
+        return key.w;
+    }
+
+    ref<PyObject> mp_subscript(PyObject* pkey)
+    {
+        ZZ::Wire key = ensure_flop(pkey);
+        ZZ::lbool val = wmap[key];
+        return Int_FromLong( val.value );
+    }
+
+    void mp_ass_subscript(PyObject* pkey, PyObject* pval)
+    {
+        ZZ::Wire key = ensure_flop(pkey);
+        long val = Int_AsLong(pval);
+
+        if( val <0 || val>3 )
+        {
+            throw py::exception(PyExc_ValueError);
+        }
+
+        wmap(key) = ZZ::lbool_new(val);
+    }
+
+public:
+
+    ZC& wmap;
+    ref<PyObject> _ref;
+};
+
+
+
 template<typename pytype>
 class VecIterator :
     public type_base<VecIterator<pytype> >
@@ -357,6 +429,8 @@ public:
     ref<PyObject> get_constraints();
     ref<PyObject> get_fair_properties();
     ref<PyObject> get_fair_constraints();
+
+    ref<PyObject> get_flop_init();
 
     ref<PyObject> copy();
 

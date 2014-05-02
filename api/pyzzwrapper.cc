@@ -433,6 +433,14 @@ Netlist::initialize(PyObject* module)
 
     _type.tp_methods = methods;
 
+    static PyGetSetDef getset[] = {
+        PYTHONWRAPPER_GETTER(flop_init, Netlist, get_flop_init, ""),
+        { NULL } // sentinel
+    };
+
+    _type.tp_getset = getset;
+
+
     base::initialize("pyzz.netlist");
     add_to_module(module, "netlist");
 }
@@ -695,6 +703,14 @@ Netlist::get_fair_constraints()
     fair_constraints.copyTo(props);
 
     return VecIterator<Wire>::build(props);
+}
+
+ref<PyObject>
+Netlist::get_flop_init()
+{
+    ZZ::Get_Pob(N, flop_init);
+    borrowed_ref<Netlist> pp(this);
+    return FlopInitMap::build(flop_init, pp);
 }
 
 ref<PyObject>
@@ -1350,7 +1366,17 @@ Unroll::unroll_wire(ZZ::Wire w, int k)
         {
             if( _init )
             {
-                return ~F.True();
+                ZZ::Get_Pob(N, flop_init);
+                ZZ::lbool init_val = flop_init[w];
+
+                if( init_val == ZZ::l_True)
+                {
+                    return F.True();
+                }
+                else if ( init_val == ZZ::l_False)
+                {
+                    return ~F.True();
+                }
             }
 
             return F.add( ZZ::PI_( F.typeCount(ZZ::gate_PI) ) );
@@ -1536,6 +1562,7 @@ init()
     Wire::initialize(mod);
     WMap<Wire>::initialize(mod,"_pyzz.wwmap", "wwmap");
     WMap<Lit>::initialize(mod,"_pyzz.wlmap", "wlmap");
+    FlopInitMap::initialize(mod, "_pyzz.flop_init_map", "flop_init_map");
     VecIterator<Wire>::initialize(mod, "_pyzz.witerator", "witerator");
     VecIterator<lbool_proxy>::initialize(mod, "_pyzz.lbooliterator", "lbooliterator");
     Netlist::initialize(mod);

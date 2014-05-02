@@ -109,10 +109,10 @@ class unrollx(object):
         return self.wmaps[k][w]
 
 def ite(i, t, e):
-    return i&t | ~i&e
+    return i.ite(t,e)
 
 def imply(lhs, rhs):
-    return ~lhs | rhs
+    return lhs.implies(rhs)
 
 def cyclic(S):
     
