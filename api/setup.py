@@ -29,10 +29,10 @@ libraries = [
     "ZZ_Netlist", 
     "ZZ_Generics", 
     "ZZ_CmdLine", 
-    "ZZ_Prelude"
+    "ZZ_Prelude",
     ]
 
-extra_link_args = ['-Wl,-whole-archive'] + [ '-l%s'%l for l in libraries ] + ['-Wl,-no-whole-archive', '-Xlinker', '-export-dynamic', '-fPIC']
+extra_link_args = ['-Wl,-whole-archive'] + [ '-l%s'%l for l in libraries ] + ['-Wl,-no-whole-archive', '-Xlinker', '-export-dynamic', '-fPIC', '-lrt']
 
 with os.popen("uname -mrs", "r") as p:
     machine = p.readline().rstrip().replace(' ', '-')
