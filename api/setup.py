@@ -55,6 +55,6 @@ setup(
     name='pyzz',
     version='1.0',
     ext_modules=[ext],
-    py_modules=['pyzz', 'unionfind'],
+    py_modules=['pyzz'],
     cmdclass={'build_ext':build_ext_subclass}
     )
