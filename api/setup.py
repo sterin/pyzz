@@ -36,6 +36,7 @@ libraries = [
 extra_link_args = ['-Wl,-whole-archive'] + [ '-l%s'%l for l in libraries ] + ['-Wl,-no-whole-archive']
 
 if platform.system()=='Linux':
+    extra_link_args.append( '-fPIC' )
     extra_link_args.append( '-lrt' )
 
 with os.popen("uname -mrs", "r") as p:
@@ -47,8 +48,7 @@ ext = Extension(
     '_pyzz',
     ['_pyzz.cpp'],
     library_dirs=library_dirs,
-    extra_link_args=extra_link_args,
-    extra_compiler_args=['-fPIC']
+    extra_link_args=extra_link_args
     )
 
 setup(
