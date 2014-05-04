@@ -403,7 +403,7 @@ public:
 
     ref<PyObject> add_PI(PyObject* args);
     ref<PyObject> add_PO(PyObject* args, PyObject* kwds);
-    ref<PyObject> add_Flop(PyObject* args);
+    ref<PyObject> add_Flop(PyObject* args, PyObject* kwds);
 
     void add_property(PyObject* o);
     void add_constraint(PyObject* o);

@@ -395,7 +395,7 @@ Netlist::initialize(PyObject* module)
 
         PYTHONWRAPPER_METH_VARARGS( Netlist, add_PI, 0, ""),
         PYTHONWRAPPER_METH_KEYWORDS( Netlist, add_PO, 0, ""),
-        PYTHONWRAPPER_METH_VARARGS( Netlist, add_Flop, 0, ""),
+        PYTHONWRAPPER_METH_KEYWORDS( Netlist, add_Flop, 0, ""),
 
         PYTHONWRAPPER_METH_O( Netlist, add_property, 0, ""),
         PYTHONWRAPPER_METH_O( Netlist, add_constraint, 0, ""),
@@ -514,16 +514,34 @@ Netlist::add_PO(PyObject* args, PyObject* kwds)
 }
 
 ref<PyObject>
-Netlist::add_Flop(PyObject* args)
+Netlist::add_Flop(PyObject* args, PyObject* kwds)
 {
     int id = N.typeCount(ZZ::gate_Flop);
 
-    Arg_ParseTuple(args, "|i", &id);
+    static char *kwlist[] = { "id", "init", NULL };
+
+    borrowed_ref<PyObject> init;
+
+    Arg_ParseTupleAndKeywords(args, kwds, "|iO", kwlist, &id, &init);
+
+    ZZ::lbool init_value = ZZ::l_False;
+
+    if ( init )
+    {
+        long val = Int_AsLong(init);
+
+        if ( val<0 || val > 3 )
+        {
+            throw exception(PyExc_ValueError);
+        }
+
+        init_value = ZZ::lbool_new(val);
+    }
 
     ZZ::Wire ff = N.add(ZZ::Flop_(id));
 
     ZZ::Get_Pob(N, flop_init);
-    flop_init(ff) = ZZ::l_False;
+    flop_init(ff) = init_value;
 
     return Wire::build(ff);
 }
