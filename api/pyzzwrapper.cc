@@ -798,7 +798,10 @@ Netlist::uporder(PyObject* seq)
     ZZ::Vec<ZZ::Wire> sinks;
     zzvec_from_iter<Wire>(sinks, seq);
 
-    assert( sinks.size() > 0 );
+    if( sinks.size() <= 0)
+    {
+        throw exception::format(PyExc_ValueError, "netlist.uporder() needs at least one sink");
+    }
 
     ZZ::Vec<ZZ::gate_id> order;
     ZZ::upOrder(sinks, order, false);
