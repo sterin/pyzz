@@ -397,10 +397,10 @@ Netlist::initialize(PyObject* module)
         PYTHONWRAPPER_METH_VARARGS( Netlist, add_PO, 0, ""),
         PYTHONWRAPPER_METH_VARARGS( Netlist, add_Flop, 0, ""),
 
-        PYTHONWRAPPER_METH_VARARGS( Netlist, add_property, 0, ""),
-        PYTHONWRAPPER_METH_VARARGS( Netlist, add_constraint, 0, ""),
-        PYTHONWRAPPER_METH_VARARGS( Netlist, add_fair_property, 0, ""),
-        PYTHONWRAPPER_METH_VARARGS( Netlist, add_fair_constraint, 0, ""),
+        PYTHONWRAPPER_METH_O( Netlist, add_property, 0, ""),
+        PYTHONWRAPPER_METH_O( Netlist, add_constraint, 0, ""),
+        PYTHONWRAPPER_METH_O( Netlist, add_fair_property, 0, ""),
+        PYTHONWRAPPER_METH_O( Netlist, add_fair_constraint, 0, ""),
 
         PYTHONWRAPPER_METH_NOARGS( Netlist, get_PIs, 0, ""),
         PYTHONWRAPPER_METH_NOARGS( Netlist, get_POs, 0, ""),
@@ -516,7 +516,7 @@ Netlist::add_Flop(PyObject* args)
     return Wire::build(ff);
 }
 
-ref<PyObject>
+void
 Netlist::add_property(PyObject* o)
 {
     Wire& w = Wire::ensure(o);
@@ -525,7 +525,7 @@ Netlist::add_property(PyObject* o)
     properties.push(w.w);
 }
 
-ref<PyObject>
+void
 Netlist::add_constraint(PyObject* o)
 {
     Wire& w = Wire::ensure(o);
@@ -534,8 +534,7 @@ Netlist::add_constraint(PyObject* o)
     constraints.push(w.w);
 }
 
-
-ref<PyObject>
+void
 Netlist::add_fair_property(PyObject* o)
 {
     ZZ::Vec<ZZ::Wire> fcs;
@@ -546,7 +545,7 @@ Netlist::add_fair_property(PyObject* o)
     fcs.copyTo(fair_properties.last());
 }
 
-ref<PyObject>
+void
 Netlist::add_fair_constraint(PyObject* o)
 {
     Wire& w = Wire::ensure(o);

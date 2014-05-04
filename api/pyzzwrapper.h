@@ -405,10 +405,10 @@ public:
     ref<PyObject> add_PO(PyObject* args);
     ref<PyObject> add_Flop(PyObject* args);
 
-    ref<PyObject> add_property(PyObject* o);
-    ref<PyObject> add_constraint(PyObject* o);
-    ref<PyObject> add_fair_property(PyObject* o);
-    ref<PyObject> add_fair_constraint(PyObject* o);
+    void add_property(PyObject* o);
+    void add_constraint(PyObject* o);
+    void add_fair_property(PyObject* o);
+    void add_fair_constraint(PyObject* o);
 
     ref<PyObject> n_PIs();
     ref<PyObject> n_POs();
