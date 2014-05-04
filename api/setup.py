@@ -5,16 +5,26 @@ from distutils.core import setup
 from distutils.extension import Extension
 from distutils.command.build_ext import build_ext
 
-config = 'release_i'
+def pyzz_lib():
+    
+    def parts(path):
+        
+        while True:
+                    
+            if os.path.exists(os.path.join(path, '.zb_root')):
+                break
+    
+            path, tail = os.path.split(path)
+            
+            if not tail:
+                raise RuntimeError("could not find .zb_root")
+            
+            yield tail
 
-class build_ext_subclass( build_ext ):
-    def build_extensions(self):
-        args = ['../../BUILD/zz_gdep_link'] + self.compiler.compiler_cxx[1:]
-        self.compiler.compiler_cxx = args
-        build_ext.build_extensions(self)
-
+    return "ZZ_" + ".".join(reversed(list(parts(os.getcwd()))))
+        
 libraries = [
-    "ZZ_pyzz.api", 
+    pyzz_lib(), 
     "ZZ_Bip", 
     "ZZ_CnfMap", 
     "ZZ_AbcInterface", 
@@ -42,12 +52,27 @@ if platform.system()=='Linux':
 with os.popen("uname -mrs", "r") as p:
     machine = p.readline().rstrip().replace(' ', '-')
 
-library_dirs = [ "../../lib/%s/%s"%(machine, config) ]
+class build_ext_subclass( build_ext ):
+
+    def build_extensions(self):
+
+        if self.debug:
+            config = 'quick_i'
+        else:
+            config = 'release_i'
+        
+        library_dir = "../../lib/%s/%s"%(machine, config)
+        
+        for ext in self.extensions:
+            ext.library_dirs.append(library_dir)
+        
+        args = ['../../BUILD/zz_gdep_link'] + self.compiler.compiler_cxx[1:]
+        self.compiler.compiler_cxx = args
+        build_ext.build_extensions(self)
 
 ext = Extension(
     '_pyzz',
     ['_pyzz.cpp'],
-    library_dirs=library_dirs,
     extra_link_args=extra_link_args
     )
 
