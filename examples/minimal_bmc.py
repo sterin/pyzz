@@ -5,7 +5,7 @@ def bmc(N, max, symbols, filter=lambda sym: True, cex=True):
     U = unroll(N, init=True)
     S = solver(U.F)
     
-    po = disjunction( N, [ po[0] for po in N.get_properties()]  )
+    po = disjunction( N, [ po[0]^po.sign() for po in N.get_properties()]  )
  
     for frame in xrange(max):
         
