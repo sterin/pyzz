@@ -108,6 +108,7 @@ public:
 
     ref<PyObject> implies(PyObject* o);
     ref<PyObject> ite(PyObject* o);
+    ref<PyObject> equals(PyObject* o);
 
     ref<PyObject> is_True();
     ref<PyObject> is_PI();

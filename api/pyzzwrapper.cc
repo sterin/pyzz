@@ -185,6 +185,7 @@ Wire::initialize(PyObject* module)
 
         PYTHONWRAPPER_METH_O(Wire, implies, 0, ""),
         PYTHONWRAPPER_METH_VARARGS(Wire, ite, 0, ""),
+        PYTHONWRAPPER_METH_O(Wire, equals, 0, ""),
 
         { NULL }  // sentinel
     };
@@ -286,6 +287,13 @@ Wire::ite(PyObject* args)
     Wire& wE = Wire::ensure(E);
 
     return build( s_Or( s_And(w, wT.w), s_And(~w, wE.w) ) ) ;
+}
+
+ref<PyObject>
+Wire::equals(PyObject* o)
+{
+    Wire& rhs = Wire::ensure(o);
+    return build( s_Equiv(w, rhs.w) ) ;
 }
 
 ref<PyObject>
