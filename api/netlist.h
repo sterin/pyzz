@@ -54,6 +54,7 @@ public:
     ref<PyObject> get_fair_constraints();
 
     ref<PyObject> get_flop_init();
+    ref<PyObject> get_names();
 
     ref<PyObject> copy();
 

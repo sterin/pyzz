@@ -17,7 +17,7 @@ public:
     typedef type_base<C> base;
 
     FlopInitMap(ZC& m, borrowed_ref<PyObject> p) :
-        wmap(m),
+        _wmap(m),
         _ref(p)
     {
     }
@@ -54,7 +54,7 @@ public:
     ref<PyObject> mp_subscript(PyObject* pkey)
     {
         ZZ::Wire key = ensure_flop(pkey);
-        ZZ::lbool val = wmap[key];
+        ZZ::lbool val = _wmap[key];
         return Int_FromLong( val.value );
     }
 
@@ -68,13 +68,138 @@ public:
             throw py::exception(PyExc_ValueError);
         }
 
-        wmap(key) = ZZ::lbool_new(val);
+        _wmap(key) = ZZ::lbool_new(val);
     }
 
+private:
+
+    ZC& _wmap;
+    ref<PyObject> _ref;
+};
+
+class NameStore :
+    public type_base<NameStore>
+{
 public:
 
-    ZC& wmap;
-    ref<PyObject> _ref;
+    typedef NameStore C;
+    typedef type_base<NameStore> base;
+
+    NameStore(ZZ::NameStore& ns, borrowed_ref<Netlist> N) :
+        _ns(ns),
+        _N(N)
+    {
+    }
+
+    ~NameStore()
+    {
+    }
+
+    static void initialize(PyObject* module, const char* mname, const char* name)
+    {
+        static PyMethodDef methods[] = {
+            PYTHONWRAPPER_METH_VARARGS( NameStore, add, 0, ""),
+            PYTHONWRAPPER_METH_O( NameStore, invert, 0, ""),
+            PYTHONWRAPPER_METH_O( NameStore, clear, 0, ""),
+            { NULL }  // sentinel
+        };
+
+        _type.tp_methods = methods;
+
+        static PyMappingMethods as_mapping = { 0 };
+
+        as_mapping.mp_subscript = wrappers::binaryfunc<C, &C::mp_subscript>;
+
+        base::_type.tp_as_mapping = &as_mapping;
+
+        static PySequenceMethods as_sequence = { 0 };
+
+        as_sequence.sq_contains = wrappers::objobjproc<C, &C::sq_contains>;
+
+        base::_type.tp_as_sequence = &as_sequence;
+
+        base::initialize(mname);
+        base::add_to_module(module, name);
+    }
+
+    void add(PyObject* args)
+    {
+        borrowed_ref<PyObject> o;
+        char* name;
+
+        Arg_ParseTuple(args, "Os", &o, &name);
+
+        Wire& w = Wire::ensure(o);
+
+        _ns.add(w.w, name);
+    }
+
+    void invert(PyObject* o)
+    {
+        Wire& w = Wire::ensure(o);
+        _ns.invert(w.w);
+    }
+
+    void clear(PyObject* o)
+    {
+        Wire& w = Wire::ensure(o);
+        _ns.clear(w.w);
+    }
+
+    ref<PyObject> mp_subscript(PyObject* o)
+    {
+        if ( Wire::check(o) )
+        {
+            Wire& w = Wire::ensure(o);
+            const uind size = _ns.size(w.w);
+
+            if( size == 0)
+            {
+                throw exception(PyExc_KeyError);
+            }
+
+            ref<PyObject> list = List_New(size);
+            ZZ::Vec<char> name;
+
+            for( uind i=0 ; i<size ; i++)
+            {
+                _ns.get(w.w, name, i);
+                List_SetItem(list, i, String_FromString(name.base()));
+            }
+
+            return list;
+        }
+
+        const char* name = String_AsString(o);
+
+        ZZ::GLit gl = _ns.lookup(name);
+
+        if ( gl == ZZ::glit_NULL )
+        {
+            throw exception(PyExc_KeyError);
+        }
+
+        return Wire::build(_N->N[gl]);
+    }
+
+    int sq_contains(PyObject* o)
+    {
+        if ( Wire::check(o) )
+        {
+            Wire& w = Wire::ensure(o);
+            return _ns.size(w.w)>0;
+        }
+
+        const char* name = String_AsString(o);
+        ZZ::GLit gl = _ns.lookup(name);
+
+        return gl != ZZ::glit_NULL;
+    }
+
+private:
+
+    ZZ::NameStore& _ns;
+    ref<Netlist> _N;
 };
 
 Netlist::Netlist(bool empty)
@@ -98,6 +223,8 @@ Netlist::assure_pobs()
     ZZ::Assure_Pob0(N, constraints);
     ZZ::Assure_Pob0(N, fair_properties);
     ZZ::Assure_Pob0(N, fair_constraints);
+
+    N.names().enableLookup();
 }
 
 void
@@ -155,6 +282,7 @@ Netlist::initialize(PyObject* module)
 
     static PyGetSetDef getset[] = {
         PYTHONWRAPPER_GETTER(flop_init, Netlist, get_flop_init, ""),
+        PYTHONWRAPPER_GETTER(names, Netlist, get_names, ""),
         { NULL } // sentinel
     };
 
@@ -165,6 +293,7 @@ Netlist::initialize(PyObject* module)
     add_to_module(module, "netlist");
 
     FlopInitMap::initialize(module, "_pyzz.flop_init_map", "flop_init_map");
+    NameStore::initialize(module, "_pyzz.name_store", "name_store");
 }
 
 ref<PyObject>
@@ -464,6 +593,13 @@ Netlist::get_flop_init()
     ZZ::Get_Pob(N, flop_init);
     borrowed_ref<Netlist> pp(this);
     return FlopInitMap::build(flop_init, pp);
+}
+
+ref<PyObject>
+Netlist::get_names()
+{
+    borrowed_ref<Netlist> pp(this);
+    return NameStore::build(N.names(), pp);
 }
 
 ref<PyObject>
