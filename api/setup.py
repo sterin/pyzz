@@ -1,8 +1,7 @@
 import os
 import platform
 
-from distutils.core import setup
-from distutils.extension import Extension
+from setuptools import setup, Extension
 from distutils.command.build_ext import build_ext
 
 def pyzz_lib():
@@ -71,7 +70,7 @@ class build_ext_subclass( build_ext ):
         build_ext.build_extensions(self)
 
 ext = Extension(
-    '_pyzz',
+    'pyzz._pyzz',
     ['_pyzz.cpp'],
     extra_link_args=extra_link_args
     )
@@ -80,6 +79,6 @@ setup(
     name='pyzz',
     version='1.0',
     ext_modules=[ext],
-    py_modules=['pyzz'],
+    packages=['pyzz'],
     cmdclass={'build_ext':build_ext_subclass}
     )

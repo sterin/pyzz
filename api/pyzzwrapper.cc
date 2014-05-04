@@ -1585,7 +1585,7 @@ init()
     };
 
     borrowed_ref<PyObject> mod = InitModule4(
-        "_pyzz",
+        "pyzz._pyzz",
         pyzz_methods,
         "Python interface to ZZ and Bip",
         NULL,
