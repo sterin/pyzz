@@ -394,7 +394,7 @@ Netlist::initialize(PyObject* module)
         PYTHONWRAPPER_METH_NOARGS( Netlist, get_True, 0, ""),
 
         PYTHONWRAPPER_METH_VARARGS( Netlist, add_PI, 0, ""),
-        PYTHONWRAPPER_METH_VARARGS( Netlist, add_PO, 0, ""),
+        PYTHONWRAPPER_METH_KEYWORDS( Netlist, add_PO, 0, ""),
         PYTHONWRAPPER_METH_VARARGS( Netlist, add_Flop, 0, ""),
 
         PYTHONWRAPPER_METH_O( Netlist, add_property, 0, ""),
@@ -492,13 +492,25 @@ Netlist::add_PI(PyObject* args)
 }
 
 ref<PyObject>
-Netlist::add_PO(PyObject* args)
+Netlist::add_PO(PyObject* args, PyObject* kwds)
 {
     int id = N.typeCount(ZZ::gate_PO);
 
-    Arg_ParseTuple(args, "|i", &id);
+    static char *kwlist[] = { "id", "fanin", NULL };
 
-    return Wire::build(N.add(ZZ::PO_(id)));
+    borrowed_ref<PyObject> fanin;
+
+    Arg_ParseTupleAndKeywords(args, kwds, "|iO", kwlist, &id, &fanin);
+
+    ZZ::Wire po = N.add(ZZ::PO_(id));
+
+    if( fanin )
+    {
+        Wire& fi = Wire::ensure(fanin);
+        po.set(0, fi.w);
+    }
+
+    return Wire::build(po);
 }
 
 ref<PyObject>
