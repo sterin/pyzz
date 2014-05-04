@@ -510,15 +510,17 @@ Netlist::add_PO(PyObject* args, PyObject* kwds)
 
     Arg_ParseTupleAndKeywords(args, kwds, "|iO", kwlist, &id, &fanin);
 
-    ZZ::Wire po = N.add(ZZ::PO_(id));
-
     if( fanin )
     {
         Wire& fi = Wire::ensure(fanin);
+
+        ZZ::Wire po = N.add(ZZ::PO_(id));
         po.set(0, fi.w);
+
+        return Wire::build(po);
     }
 
-    return Wire::build(po);
+    return Wire::build(N.add(ZZ::PO_(id)));
 }
 
 ref<PyObject>
