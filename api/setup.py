@@ -2,7 +2,7 @@ import os
 import platform
 
 from setuptools import setup, Extension
-from distutils.command.build_ext import build_ext
+from setuptools.command.build_ext import build_ext
 
 def pyzz_lib():
     
@@ -67,7 +67,8 @@ class build_ext_subclass( build_ext ):
         
         args = ['../../BUILD/zz_gdep_link'] + self.compiler.compiler_cxx[1:]
         self.compiler.compiler_cxx = args
-        build_ext.build_extensions(self)
+        
+        return build_ext.build_extensions(self)
 
 ext = Extension(
     'pyzz._pyzz',
