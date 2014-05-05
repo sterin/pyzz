@@ -13,7 +13,7 @@ class FlopInitMap :
 public:
 
     typedef FlopInitMap C;
-    typedef ZZ::Pec_LProp<ZZ::lbool,ZZ::gate_Flop> ZC;
+    typedef ZZ::Pec_FlopInit ZC;
     typedef type_base<C> base;
 
     FlopInitMap(ZC& m, borrowed_ref<PyObject> p) :
