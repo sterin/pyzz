@@ -602,10 +602,80 @@ Netlist::get_names()
     return NameStore::build(N.names(), pp);
 }
 
+void
+Netlist::copy_props(ZZ::Netlist& M, const ZZ::WWMap& xlat)
+{
+    ZZ::Get_Pob(N, properties);
+    ZZ::Get_Pob2(M, properties, M_properties);
+
+    for(uind i=0; i<properties.size() ; i++)
+    {
+        ZZ::Wire w = properties[i];
+        M_properties.push( M[xlat[w]] );
+    }
+
+    ZZ::Get_Pob(N, constraints);
+    ZZ::Get_Pob2(M, constraints, M_constraints);
+
+    for(uind i=0; i<constraints.size() ; i++)
+    {
+        ZZ::Wire w = constraints[i];
+        M_constraints.push( M[xlat[w]]);
+    }
+
+    ZZ::Get_Pob(N, fair_properties);
+    ZZ::Get_Pob2(M, fair_properties, M_fair_properties);
+
+    for(uind i=0; i<fair_properties.size() ; i++)
+    {
+        ZZ::Vec<ZZ::Wire>& v = fair_properties[i];
+
+        M_fair_properties.push();
+        ZZ::Vec<ZZ::Wire>& mv = M_fair_properties.last();
+        mv.setSize(v.size());
+
+        for(uind j=0 ; j<v.size() ; j++)
+        {
+            ZZ::Wire w = v[j];
+            mv[j] = M[xlat[w]];
+        }
+    }
+
+    ZZ::Get_Pob(N, fair_constraints);
+    ZZ::Get_Pob2(M, fair_constraints, M_fair_constraints);
+
+    for(uind i=0; i<fair_constraints.size() ; i++)
+    {
+        ZZ::Wire w = fair_constraints[i];
+        M_fair_constraints.push( M[xlat[w]]);
+    }
+}
+
+void
+Netlist::copy_names(ZZ::Netlist& M, const ZZ::WWMap& xlat)
+{
+    ZZ::NameStore& names = N.names();
+    ZZ::NameStore& M_names = M.names();
+
+    ZZ::Vec<char> name;
+
+    For_Gates(N, w)
+    {
+        ZZ::Wire mw = M[xlat[w]];
+
+        for(uind i=0; i<names.size(w); i++ )
+        {
+            names.get(w, name, i);
+            M_names.add(mw, name.base());
+        }
+    }
+}
+
 ref<PyObject>
 Netlist::copy()
 {
     ref<Netlist> CN = build();
+    CN->assure_pobs();
 
     ZZ::Netlist& M = CN->N;
 
@@ -618,14 +688,14 @@ Netlist::copy()
         xlat(pi) = M.add(ZZ::PI_(id));
     }
 
-    ZZ::Add_Pob(M, flop_init);
+    ZZ::Get_Pob(M, flop_init);
 
     For_Gatetype(N, ZZ::gate_Flop, ff)
     {
         int id = M.typeCount(ZZ::gate_Flop);
         ZZ::Wire mff = M.add(ZZ::Flop_(id));
-        flop_init(mff) = ZZ::l_False;
         xlat(ff) = mff;
+        flop_init(mff) = flop_init[ff];
     }
 
     For_Gatetype(N, ZZ::gate_And, g)
@@ -644,10 +714,13 @@ Netlist::copy()
     For_Gatetype(N, ZZ::gate_PO, po)
     {
         int id = M.typeCount(ZZ::gate_PO);
-
         ZZ::Wire mpo = M.add(ZZ::PO_(id));
+        xlat(po) = mpo;
         mpo.set(0, xlat[po[0]]);
     }
+
+    copy_props(M, xlat);
+    copy_names(M, xlat);
 
     return CN;
 }
