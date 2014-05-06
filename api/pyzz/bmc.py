@@ -57,7 +57,7 @@ def print_cex( U, S, symbols, loop=None, filter=filter_underscore ):
     
     if "_LIVENESS_LOOP_START" in symbols:
         lls = symbols["_LIVENESS_LOOP_START"]
-        for i in xrange(U.frames):
+        for i in xrange(len(U)):
             if S[U[lls,i]] == solver.l_True:
                 loop=i+1
                 break
@@ -68,7 +68,7 @@ def print_cex( U, S, symbols, loop=None, filter=filter_underscore ):
         
         print "%-*s:"%(maxlen,sym),
 
-        for i in xrange(U.frames):
+        for i in xrange(len(U)):
             if loop is not None and loop==i :
                 print "|",
             x = U[w,i]
@@ -86,8 +86,6 @@ def simple_safety_bmc(N, bad, constr, max, start_frame, handle_sat, handle_unsat
         
         start_frame(frame)
         
-        U.unroll(1)
-    
         fbad = U[bad, frame]
         S.cube( U[constr, frame] )
     
