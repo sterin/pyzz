@@ -207,6 +207,7 @@ Unroll::unroll(ZZ::GLit w, uint k)
         }
         else if( ! is_visited(cur) )
         {
+            visit(cur);
             _dfs_stack.push(cur.mark());
             push_children(cur);
         }
