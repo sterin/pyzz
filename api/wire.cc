@@ -119,7 +119,7 @@ Wire::nb_positive()
 ref<PyObject>
 Wire::nb_and(PyObject* o)
 {
-    Wire& rhs = ensure(o);
+    Wire& rhs = Wire::ensure(o);
 
     return build(s_And(w, rhs.w));
 }

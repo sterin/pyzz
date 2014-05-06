@@ -30,12 +30,6 @@ Solver::~Solver()
 {
 }
 
-PyObject*
-Solver::base_construct(PyTypeObject *subtype, PyObject *args, PyObject *kwds)
-{
-    return _type.tp_alloc(subtype, 0);
-}
-
 void
 Solver::construct(Solver* p, PyObject* args, PyObject*)
 {

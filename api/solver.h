@@ -14,7 +14,6 @@ public:
     Solver(ZZ::NetlistRef N);
     ~Solver();
 
-    static PyObject* base_construct(PyTypeObject *subtype, PyObject *args, PyObject *kwds);
     static void construct(Solver* p, PyObject* args, PyObject* kwds);
 
     static void initialize(PyObject* module);
