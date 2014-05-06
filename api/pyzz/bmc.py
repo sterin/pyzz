@@ -84,7 +84,7 @@ def simple_safety_bmc(N, bad, constr, max, start_frame, handle_sat, handle_unsat
     
     for frame in xrange(max):
         
-        start_frame(frame)
+        start_frame(U, S, frame)
         
         fbad = U[bad, frame]
         S.cube( U[constr, frame] )
@@ -98,7 +98,7 @@ def simple_safety_bmc(N, bad, constr, max, start_frame, handle_sat, handle_unsat
             
         elif rc == solver.l_False:
 
-            handle_unsat(frame)
+            handle_unsat(U, S, frame)
             S.cube( ~f for f in fbad )
 
     return solver.l_Undef
@@ -108,7 +108,7 @@ def safety_bmc(N, max, symbols=None, filter=filter_underscore, cex=True):
     if symbols is None:
         symbols = make_symbols(N)
 
-    def start_frame(frame):
+    def start_frame(U, S, frame):
         print "frame %5d: "%frame,
 
     def handle_sat(U, S, frame):
@@ -116,7 +116,7 @@ def safety_bmc(N, max, symbols=None, filter=filter_underscore, cex=True):
         if cex:
             print_cex(U, S, symbols, filter=filter)
     
-    def handle_unsat(frame):
+    def handle_unsat(U, S, frame):
         print "UNSAT"
 
     bad = [ ~po[0]^po.sign() for po in N.get_properties() ]
