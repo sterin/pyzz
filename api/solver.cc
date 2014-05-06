@@ -96,7 +96,19 @@ Solver::initialize(PyObject* module)
 
     Dict_SetItem(
         dict,
+        String_FromString("UNDEF"),
+        readonly_static_descriptor::build( Int_FromLong( ZZ::l_Undef.value )).get_cast<PyObject>()
+    );
+
+    Dict_SetItem(
+        dict,
         String_FromString("l_Error"),
+        readonly_static_descriptor::build( Int_FromLong( ZZ::l_Error.value )).get_cast<PyObject>()
+    );
+
+    Dict_SetItem(
+        dict,
+        String_FromString("ERROR"),
         readonly_static_descriptor::build( Int_FromLong( ZZ::l_Error.value )).get_cast<PyObject>()
     );
 
@@ -108,7 +120,19 @@ Solver::initialize(PyObject* module)
 
     Dict_SetItem(
         dict,
+        String_FromString("UNSAT"),
+        readonly_static_descriptor::build( Int_FromLong( ZZ::l_False.value )).get_cast<PyObject>()
+    );
+
+    Dict_SetItem(
+        dict,
         String_FromString("l_True"),
+        readonly_static_descriptor::build( Int_FromLong( ZZ::l_True.value )).get_cast<PyObject>()
+    );
+
+    Dict_SetItem(
+        dict,
+        String_FromString("SAT"),
         readonly_static_descriptor::build( Int_FromLong( ZZ::l_True.value )).get_cast<PyObject>()
     );
 

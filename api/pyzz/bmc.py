@@ -91,17 +91,17 @@ def simple_safety_bmc(N, bad, constr, max, start_frame, handle_sat, handle_unsat
     
         rc = S.solve( *fbad )
 
-        if rc == solver.l_True:
+        if rc == solver.SAT:
 
             handle_sat(U, S, frame)            
             return rc
             
-        elif rc == solver.l_False:
+        elif rc == solver.UNSAT:
 
             handle_unsat(U, S, frame)
             S.cube( ~f for f in fbad )
 
-    return solver.l_Undef
+    return solver.UNDEF
 
 def safety_bmc(N, max, symbols=None, filter=filter_underscore, cex=True):
 
