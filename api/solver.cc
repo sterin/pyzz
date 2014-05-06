@@ -240,7 +240,7 @@ Solver::cube(PyObject* args, PyObject* kwds)
 void
 Solver::implication(PyObject* args, PyObject* kwds)
 {
-    static char *kwlist[] = { "control", NULL };
+    static char *kwlist[] = { "a", "b", "control", NULL };
 
     borrowed_ref<PyObject> control;
     borrowed_ref<PyObject> w1, w2;
@@ -263,7 +263,7 @@ Solver::implication(PyObject* args, PyObject* kwds)
 void
 Solver::equivalence(PyObject* args, PyObject* kwds)
 {
-    static char *kwlist[] = { "control", NULL };
+    static char *kwlist[] = { "a", "b", "control", NULL };
 
     borrowed_ref<PyObject> control;
     borrowed_ref<PyObject> w1, w2;
