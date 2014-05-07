@@ -26,7 +26,25 @@ class fmap(object):
         
     def __delitem__(self, k):
         del self[+k]
-        
+
+class wset(object):
+
+    def __init__(self, seq=None):
+        self.m = set()
+
+        if seq:
+            for k,v in seq:
+                self[+k] = v
+
+    def add(self, w):
+        self.m.add(+w)
+
+    def remove(self, w):
+        self.m.remove(+w)
+
+    def __contains__(self, k):
+        return +k in self.m
+
 def cyclic(S):
     
     iter = S.__iter__()
