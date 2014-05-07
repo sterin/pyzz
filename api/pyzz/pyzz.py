@@ -34,6 +34,12 @@ def somepast(N, x):
 def past_since( N, x, trigger):
     return somepast( N, x&somepast( N, trigger) )
 
+def seen_since(N, x, event):
+    ff = N.add_Flop()
+    next_ff = event.ite( x, ff|x )
+    ff[0] = next_ff
+    return next_ff, ff
+
 def monotone(N):
     pi = N.add_PI()
     ff = N.add_Flop()
