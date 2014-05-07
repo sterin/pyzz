@@ -7,6 +7,8 @@
 
 #include "readonly_static_descriptor.h"
 
+#include <limits>
+
 #include <structmember.h>
 
 namespace pyzz
@@ -15,15 +17,12 @@ namespace pyzz
 using namespace py;
 
 Solver::Solver(ZZ::NetlistRef N) :
-    _callback(None),
-    _fail(false),
+    _conflict_limit(static_cast<uint64>(UINT64_MAX)),
     _conflict(None),
     _N(N),
     _C(_S, _N, _wtos, _keep)
 {
     _C.initKeep();
-    _S.timeout_cb = sat_callback;
-    _S.timeout_cb_data = this;
 }
 
 Solver::~Solver()
@@ -72,9 +71,8 @@ Solver::initialize(PyObject* module)
     _type.tp_methods = methods;
 
     static PyGetSetDef getset[] = {
-        PYTHONWRAPPER_GETSET(callback, Solver, _callback, _callback, "SAT callback"),
         PYTHONWRAPPER_GETTER(conflict, Solver, _conflict, "conflict clause (in terms of assumptions)"),
-        PYTHONWRAPPER_GETSET(timeout, Solver, get_timeout, set_timeout, "SAT timeout"),
+        PYTHONWRAPPER_GETSET(conflict_limit, Solver, get_conflict_limit, set_conflict_limit, "SAT timeout"),
         { NULL } // sentinel
     };
 
@@ -304,34 +302,33 @@ Solver::solve(PyObject* seq)
         lit_to_ass.set(l, i++);
     }
 
-    _fail = false;
     _conflict = None;
 
     ZZ::lbool res;
+
+    _S.setConflictLim(_conflict_limit);
 
     {
         enable_threads threads;
         res = _S.solve(assumptions);
     }
 
-    if (_fail)
-    {
-        exception::check();
-    }
-
     if ( res == ZZ::l_False )
     {
-        _conflict = List_New(_S.conflict.size());
+        ZZ::Vec<ZZ::Lit> conflict;
+        _S.getConflict(conflict);
 
-        for(uind i=0; i<_S.conflict.size() ; i++)
+        _conflict = List_New(conflict.size());
+
+        for(uind i=0; i< conflict.size() ; i++)
         {
-            ZZ::Lit l = _S.conflict[i];
+            ZZ::Lit l = conflict[i];
 
-            uind* idx;
-            bool found  = lit_to_ass.get(l, idx);
+            uind idx;
+            bool found  = lit_to_ass.peek(l, idx);
             assert( found );
 
-            borrowed_ref<PyObject> a = List_GetItem(py_assumptions, *idx);
+            borrowed_ref<PyObject> a = List_GetItem(py_assumptions, idx);
             List_SetItem(_conflict, i, a);
         }
     }
@@ -419,27 +416,40 @@ Solver::has_wire(PyObject* o)
 }
 
 void
-Solver::set_timeout(borrowed_ref<PyObject> timeout)
+Solver::set_conflict_limit(borrowed_ref<PyObject> o)
 {
-    _S.timeout = Int_AsUnsignedLongLongMask(timeout);
+    if( o == None )
+    {
+        _conflict_limit = std::numeric_limits<uint64>::max();
+    }
+    else if ( Int_Check(o) )
+    {
+        _conflict_limit = Int_AsLong(o);
+    }
+    else if ( Long_Check(o) )
+    {
+        _conflict_limit = Long_AsUnsignedLongLong(o);
+    }
+    else
+    {
+        throw exception(PyExc_TypeError);
+    }
 }
 
 ref<PyObject>
-Solver::get_timeout()
+Solver::get_conflict_limit()
 {
-    return Long_FromUnsignedLongLong(static_cast<unsigned PY_LONG_LONG>(_S.timeout));
-}
+    if( _conflict_limit == std::numeric_limits<uint64>::max() )
+    {
+        return None;
+    }
 
-void
-Solver::set_callback(borrowed_ref<PyObject> timeout)
-{
-    _callback = timeout;
-}
+    if( _conflict_limit <= std::numeric_limits<long>::max() )
+    {
+        return Int_FromLong(_conflict_limit);
+    }
 
-ref<PyObject>
-Solver::get_callback()
-{
-    return _callback;
+    return Long_FromUnsignedLongLong(_conflict_limit);
 }
 
 ZZ::Lit
@@ -458,36 +468,6 @@ Solver::get_Lit(PyObject* o)
     }
 
     throw exception( PyExc_TypeError );
-}
-
-bool
-Solver::sat_callback(uint64 work)
-{
-    if (_callback && _callback != None)
-    {
-        return Object_IsTrue( Object_CallFunction(_callback, "K", work) );
-    }
-
-    return true;
-}
-
-bool
-Solver::sat_callback(uint64 work, void* data)
-{
-    Solver* s = reinterpret_cast<Solver*>(data);
-
-    {
-        gil_state_ensure gil;
-
-        try
-        {
-            return s->sat_callback(work);
-        }
-        PYTHONWRAPPER_CATCH
-    }
-
-    s->_fail = true;
-    return false;
 }
 
 } // namespace pyzz

@@ -38,29 +38,21 @@ public:
 
     ref<PyObject> has_wire(PyObject* o);
 
-    void set_timeout(borrowed_ref<PyObject> timeout);
-    ref<PyObject> get_timeout();
-
-    void set_callback(borrowed_ref<PyObject> cb);
-    ref<PyObject> get_callback();
+    void set_conflict_limit(borrowed_ref<PyObject> timeout);
+    ref<PyObject> get_conflict_limit();
 
 private:
 
     ZZ::Lit get_Lit(PyObject* o);
 
-    bool sat_callback(uint64 work);
-    static bool sat_callback(uint64 work, void* data);
-
-    ref<PyObject> _callback;
-    bool _fail;
-
+    uint64 _conflict_limit;
     ref<PyObject> _conflict;
 
-    ZZ::SatStd _S;
+    ZZ::MiniSat2 _S;
     ZZ::NetlistRef _N;
     ZZ::WMap<ZZ::Lit> _wtos;
     ZZ::WZet _keep;
-    ZZ::Clausify<ZZ::SatStd> _C;
+    ZZ::Clausify<ZZ::MiniSat2> _C;
 };
 
 } // namesapce pyzz
