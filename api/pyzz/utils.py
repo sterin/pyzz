@@ -172,7 +172,7 @@ def pyzz_to_pyaig(N):
     from pyaig import AIG, write_aiger
 
     aig = AIG()
-    xlat = utils.fmap()
+    xlat = fmap()
 
     xlat[N.get_True()] = AIG.get_const1()
 
