@@ -84,36 +84,72 @@ def get_coi(N, sinks):
 
     return visited
     
-def copy_coi(N, roots=None):
+def topological_order(roots, stop_at = []):
 
-    if not roots:
-        roots = N.get_POs()
+    visited = set(+w for w in stop_at)
 
-    coi = get_coi(N, roots)
+    dfs_stack = [+w for w in roots if +w not in visited ]
 
-    M = netlist()
+    while dfs_stack:
+
+        w = dfs_stack.pop()
+
+        if w.sign():
+            yield +w
+
+        elif w not in visited:
+
+            dfs_stack.append(~w)
+
+            visited.add(w)
+
+            if w.is_Flop():
+                dfs_stack.append(+w[0])
+            elif w.is_PO():
+                dfs_stack.append(+w[0])
+            elif w.is_And():
+                dfs_stack.append(+w[0])
+                dfs_stack.append(+w[1])
+
+def copy_cone(N_src, N_dst, wires, stop_at={}):
 
     xlat = wwmap()
-    xlat[N.get_True()] = M.get_True()
+
+    xlat[N_src.get_True()] = N_dst.get_True()
+
+    for k, v in stop_at.iteritems():
+        xlat[k] = v
 
     flops = []
+    flop_init = N_src.flop_init
 
-    for w in N.uporder(coi):
+    for w in topological_order(wires, stop_at):
 
-        if w.is_PI():
-            xlat[w] = M.add_PI()
+        if w.is_And():
+            xlat[w] = xlat[w[0]] & xlat[w[1]]
 
         elif w.is_Flop():
             flops.append(w)
-            xlat[w] = M.add_Flop(init=N.flop_init[w])
+            xlat[w] = N_dst.add_Flop(init=flop_init[w])
 
-        elif w.is_And():
-            xlat[w] = xlat[w[0]]&xlat[w[1]]
+        elif w.is_PI():
+            xlat[w] = N_dst.add_PI()
 
         elif w.is_PO():
-            xlat[w] = M.add_PO(fanin=xlat[w[0]])
+            xlat[w] = N_dst.add_PO(fanin=xlat[w[0]])
 
     for w in flops:
         xlat[w][0] = xlat[w[0]]
+
+    return xlat
+
+def copy_coi(N, roots=None):
+
+    M = netlist()
+
+    if roots is None:
+        roots = list(N.get_POs())
+
+    xlat = copy_cone(N, M, roots)
 
     return M, xlat
