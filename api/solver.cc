@@ -30,14 +30,23 @@ Solver::~Solver()
 }
 
 void
-Solver::construct(Solver* p, PyObject* args, PyObject*)
+Solver::construct(Solver* p, PyObject* args, PyObject* kwds)
 {
+    static char *kwlist[] = { "N", "conflict_limit", NULL };
+
     borrowed_ref<PyObject> pN;
-    Arg_ParseTuple(args, "O", &pN);
+    borrowed_ref<PyObject> conflict_limit;
+
+    Arg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &pN, &conflict_limit);
 
     Netlist& N = Netlist::ensure(pN);
 
     new (p) Solver(N.N);
+
+    if( conflict_limit )
+    {
+        p->set_conflict_limit(conflict_limit);
+    }
 }
 
 void
