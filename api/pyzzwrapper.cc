@@ -99,12 +99,10 @@ init()
         { 0 }
     };
 
-    borrowed_ref<PyObject> mod = InitModule4(
+    borrowed_ref<PyObject> mod = InitModule3(
         "pyzz._pyzz",
         pyzz_methods,
-        "Python interface to ZZ and Bip",
-        NULL,
-        PYTHON_API_VERSION
+        "Python interface to ZZ and Bip"
         );
 
     Module_AddObject( mod, "zz_error", zz_error );
