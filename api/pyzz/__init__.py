@@ -1,5 +1,7 @@
-from ._pyzz import *
-from .pyzz import *
+from __future__ import absolute_import
 
-from . import utils
-from . import bmc
+from pyzz._pyzz import *
+from pyzz.pyzz import *
+
+import pyzz.utils as utils
+import pyzz.bmc as bmc
