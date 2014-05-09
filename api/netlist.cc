@@ -224,7 +224,7 @@ Netlist::assure_pobs()
     ZZ::Assure_Pob0(N, fair_properties);
     ZZ::Assure_Pob0(N, fair_constraints);
 
-    N.names().enableLookup();
+    //N.names().enableLookup();
 }
 
 void
