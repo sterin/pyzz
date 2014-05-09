@@ -98,7 +98,15 @@ Unroll::mp_subscript(PyObject* args)
 void
 Unroll::ensure_frame(uint k)
 {
+    uind prev_size = _maps.size();
+
     _maps.growTo(k + 1);
+
+    for( uind i=prev_size; i<_maps.size(); i++)
+    {
+        _maps[i](N.True()) = F.True();
+    }
+
     _visited.growTo(k + 1);
 }
 
