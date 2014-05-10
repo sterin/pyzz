@@ -164,7 +164,7 @@ Unroll::unroll_wire(stack_elem e)
         {
             if( _init )
             {
-                ZZ::Get_Pob(N, flop_init);
+                Get_Pob(N, flop_init);
                 ZZ::lbool init_val = flop_init[w];
 
                 if( init_val == ZZ::l_True)

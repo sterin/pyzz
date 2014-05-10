@@ -393,7 +393,7 @@ Netlist::add_Flop(PyObject* args, PyObject* kwds)
 
     ZZ::Wire ff = N.add(ZZ::Flop_(id));
 
-    ZZ::Get_Pob(N, flop_init);
+    Get_Pob(N, flop_init);
     flop_init(ff) = init_value;
 
     return Wire::build(ff);
@@ -404,7 +404,7 @@ Netlist::add_property(PyObject* o)
 {
     Wire& w = Wire::ensure(o);
 
-    ZZ::Get_Pob(N, properties);
+    Get_Pob(N, properties);
     properties.push(w.w);
 }
 
@@ -413,7 +413,7 @@ Netlist::add_constraint(PyObject* o)
 {
     Wire& w = Wire::ensure(o);
 
-    ZZ::Get_Pob(N, constraints);
+    Get_Pob(N, constraints);
     constraints.push(w.w);
 }
 
@@ -423,7 +423,7 @@ Netlist::add_fair_property(PyObject* o)
     ZZ::Vec<ZZ::Wire> fcs;
     zzvec_from_iter<Wire>(fcs, o);
 
-    ZZ::Get_Pob(N, fair_properties);
+    Get_Pob(N, fair_properties);
     fair_properties.push();
     fcs.copyTo(fair_properties.last());
 }
@@ -433,7 +433,7 @@ Netlist::add_fair_constraint(PyObject* o)
 {
     Wire& w = Wire::ensure(o);
 
-    ZZ::Get_Pob(N, fair_constraints);
+    Get_Pob(N, fair_constraints);
     fair_constraints.push(w.w);
 }
 void
@@ -470,28 +470,28 @@ Netlist::n_Ands()
 ref<PyObject>
 Netlist::n_properties()
 {
-    ZZ::Get_Pob(N, properties);
+    Get_Pob(N, properties);
     return Int_FromLong( properties.size() );
 }
 
 ref<PyObject>
 Netlist::n_constraints()
 {
-    ZZ::Get_Pob(N, constraints);
+    Get_Pob(N, constraints);
     return Int_FromLong( constraints.size() );
 }
 
 ref<PyObject>
 Netlist::n_fair_properties()
 {
-    ZZ::Get_Pob(N, fair_properties);
+    Get_Pob(N, fair_properties);
     return Int_FromLong( fair_properties.size() );
 }
 
 ref<PyObject>
 Netlist::n_fair_constraints()
 {
-    ZZ::Get_Pob(N, fair_constraints);
+    Get_Pob(N, fair_constraints);
     return Int_FromLong( fair_constraints.size() );
 }
 
@@ -538,7 +538,7 @@ Netlist::get_Ands()
 ref<PyObject>
 Netlist::get_properties()
 {
-    ZZ::Get_Pob(N, properties);
+    Get_Pob(N, properties);
 
     ZZ::Vec<ZZ::Wire> props;
     properties.copyTo(props);
@@ -550,7 +550,7 @@ Netlist::get_properties()
 ref<PyObject>
 Netlist::get_constraints()
 {
-    ZZ::Get_Pob(N, constraints);
+    Get_Pob(N, constraints);
 
     ZZ::Vec<ZZ::Wire> props;
     constraints.copyTo(props);
@@ -561,7 +561,7 @@ Netlist::get_constraints()
 ref<PyObject>
 Netlist::get_fair_properties()
 {
-    ZZ::Get_Pob(N, fair_properties);
+    Get_Pob(N, fair_properties);
 
     ref<PyObject> list=List_New(fair_properties.size());
 
@@ -579,7 +579,7 @@ Netlist::get_fair_properties()
 ref<PyObject>
 Netlist::get_fair_constraints()
 {
-    ZZ::Get_Pob(N, fair_constraints);
+    Get_Pob(N, fair_constraints);
 
     ZZ::Vec<ZZ::Wire> props;
     fair_constraints.copyTo(props);
@@ -590,7 +590,7 @@ Netlist::get_fair_constraints()
 ref<PyObject>
 Netlist::get_flop_init()
 {
-    ZZ::Get_Pob(N, flop_init);
+    Get_Pob(N, flop_init);
     borrowed_ref<Netlist> pp(this);
     return FlopInitMap::build(flop_init, pp);
 }
@@ -605,8 +605,8 @@ Netlist::get_names()
 void
 Netlist::copy_props(ZZ::Netlist& M, const ZZ::WWMap& xlat)
 {
-    ZZ::Get_Pob(N, properties);
-    ZZ::Get_Pob2(M, properties, M_properties);
+    Get_Pob(N, properties);
+    Get_Pob2(M, properties, M_properties);
 
     for(uind i=0; i<properties.size() ; i++)
     {
@@ -614,8 +614,8 @@ Netlist::copy_props(ZZ::Netlist& M, const ZZ::WWMap& xlat)
         M_properties.push( M[xlat[w]] );
     }
 
-    ZZ::Get_Pob(N, constraints);
-    ZZ::Get_Pob2(M, constraints, M_constraints);
+    Get_Pob(N, constraints);
+    Get_Pob2(M, constraints, M_constraints);
 
     for(uind i=0; i<constraints.size() ; i++)
     {
@@ -623,8 +623,8 @@ Netlist::copy_props(ZZ::Netlist& M, const ZZ::WWMap& xlat)
         M_constraints.push( M[xlat[w]]);
     }
 
-    ZZ::Get_Pob(N, fair_properties);
-    ZZ::Get_Pob2(M, fair_properties, M_fair_properties);
+    Get_Pob(N, fair_properties);
+    Get_Pob2(M, fair_properties, M_fair_properties);
 
     for(uind i=0; i<fair_properties.size() ; i++)
     {
@@ -641,8 +641,8 @@ Netlist::copy_props(ZZ::Netlist& M, const ZZ::WWMap& xlat)
         }
     }
 
-    ZZ::Get_Pob(N, fair_constraints);
-    ZZ::Get_Pob2(M, fair_constraints, M_fair_constraints);
+    Get_Pob(N, fair_constraints);
+    Get_Pob2(M, fair_constraints, M_fair_constraints);
 
     for(uind i=0; i<fair_constraints.size() ; i++)
     {
@@ -688,7 +688,7 @@ Netlist::copy()
         xlat(pi) = M.add(ZZ::PI_(id));
     }
 
-    ZZ::Get_Pob(M, flop_init);
+    Get_Pob(M, flop_init);
 
     For_Gatetype(N, ZZ::gate_Flop, ff)
     {
