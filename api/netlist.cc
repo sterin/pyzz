@@ -317,7 +317,7 @@ Netlist::read(PyObject* o)
 void
 Netlist::write_aiger(PyObject* o)
 {
-    writeAigerFile( String_AsString(o) , N);
+    writeAigerFile( String_AsString(o) , N, ZZ::Array<uchar>(), true);
 }
 
 void
