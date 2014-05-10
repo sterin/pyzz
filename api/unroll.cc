@@ -33,7 +33,7 @@ void Unroll::construct(Unroll* p, PyObject* args, PyObject* kwds)
 
     Arg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &pN, &pinit);
 
-    Netlist::ensure(pN).N;
+    Netlist::ensure(pN);
     bool init = Object_IsTrue(pinit);
 
     new (p) Unroll(pN, init);
