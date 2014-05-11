@@ -217,12 +217,12 @@ Netlist::~Netlist()
 void
 Netlist::assure_pobs()
 {
-    ZZ::Assure_Pob0(N, strash);
-    ZZ::Assure_Pob0(N, flop_init);
-    ZZ::Assure_Pob0(N, properties);
-    ZZ::Assure_Pob0(N, constraints);
-    ZZ::Assure_Pob0(N, fair_properties);
-    ZZ::Assure_Pob0(N, fair_constraints);
+    Assure_Pob0(N, strash);
+    Assure_Pob0(N, flop_init);
+    Assure_Pob0(N, properties);
+    Assure_Pob0(N, constraints);
+    Assure_Pob0(N, fair_properties);
+    Assure_Pob0(N, fair_constraints);
 
     //N.names().enableLookup();
 }
