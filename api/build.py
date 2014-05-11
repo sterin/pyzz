@@ -17,9 +17,20 @@ if arg == 'clean':
   shutil.rmtree('bdist', ignore_errors=True)
   sys.exit(0)
 
-elif arg=='debug':
+elif arg=='quick':
+  os.putenv('PYZZ_ZB_CONFIG', 'quick_i')
   zb_opt = 'qi'
+
+elif arg=='debug':
+  os.putenv('PYZZ_ZB_CONFIG', 'debug_i')
+  zb_opt = 'di'
+
+elif arg=='profile':
+  os.putenv('PYZZ_ZB_CONFIG', 'profile_i')
+  zb_opt = 'pi'
+
 else:
+  os.putenv('PYZZ_ZB_CONFIG', 'release_i')
   zb_opt = 'ri'
 
 rc = os.system('../../BUILD/zb %s'%zb_opt)
@@ -34,9 +45,6 @@ if sys.platform.startswith('darwin'):
 else:
   develop_args = '--user'
 
-if arg=='debug':
-  rc = os.system('python setup.py build --debug develop %s'%develop_args)
-else:
-  rc = os.system('python setup.py develop %s', develop_args)
+rc = os.system('python setup.py develop %s'%develop_args)
 
 sys.exit(rc)
