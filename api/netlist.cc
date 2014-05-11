@@ -439,7 +439,9 @@ Netlist::add_fair_constraint(PyObject* o)
 void
 Netlist::remove_unreach()
 {
+    Remove_Pob(N, strash);
     removeUnreach(N);
+    Add_Pob0(N, strash);
 }
 
 ref<PyObject>
