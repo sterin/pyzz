@@ -22,7 +22,7 @@ Solver::Solver(ZZ::NetlistRef N) :
     _N(N),
     _C(_S, _N, _wtos, _keep)
 {
-    _C.initKeep();
+    _C.quant_claus = true;
 }
 
 Solver::~Solver()
