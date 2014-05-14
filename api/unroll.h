@@ -35,6 +35,7 @@ public:
 
     Py_ssize_t mp_length();
     ref<PyObject> mp_subscript(PyObject* o);
+    int sq_contains(PyObject* pkey);
 
 private:
 

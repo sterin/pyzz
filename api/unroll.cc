@@ -43,11 +43,13 @@ void
 Unroll::initialize(PyObject* module)
 {
     static PyMappingMethods as_mapping = { 0 };
-
     as_mapping.mp_subscript = wrappers::binaryfunc<Unroll, &Unroll::mp_subscript>;
     as_mapping.mp_length = wrappers::mp_length<Unroll, &Unroll::mp_length>;
-
     _type.tp_as_mapping = &as_mapping;
+
+    static PySequenceMethods as_sequence = { 0 };
+    as_sequence.sq_contains = wrappers::objobjproc<Unroll, &Unroll::sq_contains>;
+    _type.tp_as_sequence = &as_sequence;
 
     static PyGetSetDef getset[] = {
         PYTHONWRAPPER_GETTER(N, Unroll, _N, "Netlist"),
@@ -93,6 +95,26 @@ Unroll::mp_subscript(PyObject* args)
 
     Wire& w = Wire::ensure(o);
     return Wire::build( unroll(w.w, k) );
+}
+
+int
+Unroll::sq_contains(PyObject* args)
+{
+    unsigned long k;
+    borrowed_ref<PyObject> o;
+
+    Arg_ParseTuple(args, "Ok", &o, &k);
+
+    Wire& w = Wire::ensure(o);
+
+    if( k>= _maps.size() )
+    {
+        return 0;
+    }
+
+    ZZ::GLit l = +_maps[k][w.w];
+
+    return l != ZZ::glit_NULL;
 }
 
 void
