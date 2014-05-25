@@ -724,7 +724,21 @@ Netlist::copy()
     copy_props(M, xlat);
     copy_names(M, xlat);
 
-    return CN;
+    ref<WMap<Wire>> pyxlat = WMap<Wire>::build();
+
+    pyxlat->wmap(N.True()) = M.True();
+
+    For_Gates(N, w)
+    {
+        pyxlat->wmap(w) = M[xlat[w]];
+    }
+
+    ref<PyObject> tuple = Tuple_New(2);
+
+    Tuple_SetItem(tuple, 0, CN);
+    Tuple_SetItem(tuple, 1, pyxlat);
+
+    return tuple;
 }
 
 ref<PyObject>
