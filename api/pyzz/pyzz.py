@@ -59,10 +59,11 @@ def rigid(N):
     ff[0] = ff
     return ff
 
-def get_coi(N, sinks):
+def get_coi(N, roots, stop_at):
     
-    dfs_stack = list(+w for w in sinks)
+    dfs_stack = list(+w for w in roots)
 
+    stop_at = set(stop_at)
     visited = set()
     
     while dfs_stack:
@@ -73,6 +74,9 @@ def get_coi(N, sinks):
             continue
             
         visited.add(w)
+
+        if w in stop_at:
+            continue
         
         if w.is_Flop():
             dfs_stack.append(+w[0])
@@ -103,9 +107,7 @@ def topological_order(roots, stop_at = []):
 
             visited.add(w)
 
-            if w.is_Flop():
-                dfs_stack.append(+w[0])
-            elif w.is_PO():
+            if w.is_PO():
                 dfs_stack.append(+w[0])
             elif w.is_And():
                 dfs_stack.append(+w[0])
@@ -123,14 +125,17 @@ def copy_cone(N_src, N_dst, wires, stop_at={}):
     flops = []
     flop_init = N_src.flop_init
 
-    for w in topological_order(wires, stop_at):
+    coi = get_coi(N_src, wires, stop_at)
+
+    for ff in N_src.get_Flops():
+        if ff in coi:
+            xlat[ff] = N_dst.add_Flop(init=flop_init[ff])
+            flops.append(ff)
+
+    for w in topological_order(coi, stop_at):
 
         if w.is_And():
             xlat[w] = xlat[w[0]] & xlat[w[1]]
-
-        elif w.is_Flop():
-            flops.append(w)
-            xlat[w] = N_dst.add_Flop(init=flop_init[w])
 
         elif w.is_PI():
             xlat[w] = N_dst.add_PI()
