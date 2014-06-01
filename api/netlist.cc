@@ -700,11 +700,26 @@ Netlist::copy()
         flop_init(mff) = flop_init[ff];
     }
 
+    ZZ::Vec<ZZ::gate_id> and_order;
+
     For_Gatetype(N, ZZ::gate_And, g)
     {
-        ZZ::Wire g0 = M[xlat[g[0]]];
-        ZZ::Wire g1 = M[xlat[g[1]]];
-        xlat(g) = ZZ::s_And(g0, g1);
+        and_order.push(id(g));
+    }
+
+    upOrder(N, and_order, false, false);
+
+    for(uind i=0 ; i<and_order.size() ; i++)
+    {
+        ZZ::Wire g = N[and_order[i]];
+
+        if ( type(g) == ZZ::gate_And )
+        {
+            ZZ::Wire g0 = M[xlat[g[0]]];
+            ZZ::Wire g1 = M[xlat[g[1]]];
+
+            xlat(g) = ZZ::s_And(g0, g1);
+        }
     }
 
     For_Gatetype(N, ZZ::gate_Flop, ff)
