@@ -185,8 +185,10 @@ def pyzz_to_pyaig(N):
     for ff in N.get_Flops():
         xlat[ff] = aig.create_latch(init=lbool_to_init[flop_init[ff]])
 
-    for a in N.get_Ands():
-        xlat[a] = aig.create_and( xlat[a[0]], xlat[a[1]])
+    if N.n_Ands()>0:
+        for w in N.upOrder(N.get_Ands()):
+            if w.is_And():
+                xlat[w] = aig.create_and( xlat[w[0]], xlat[w[1]])
 
     for ff in N.get_Flops():
         aig.set_next(xlat[ff], xlat[ff[0]])
