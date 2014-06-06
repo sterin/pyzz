@@ -60,6 +60,7 @@ Wire::initialize(PyObject* module)
         PYTHONWRAPPER_METH_NOARGS(Wire, is_PI, 0, ""),
         PYTHONWRAPPER_METH_NOARGS(Wire, is_And, 0, ""),
         PYTHONWRAPPER_METH_NOARGS(Wire, is_Flop, 0, ""),
+        PYTHONWRAPPER_METH_NOARGS(Wire, is_Buf, 0, ""),
         PYTHONWRAPPER_METH_NOARGS(Wire, is_PO, 0, ""),
 
         PYTHONWRAPPER_METH_O(Wire, implies, 0, ""),
@@ -197,6 +198,12 @@ ref<PyObject>
 Wire::is_Flop()
 {
     return Bool_FromLong( type(w) == ZZ::gate_Flop );
+}
+
+ref<PyObject>
+Wire::is_Buf()
+{
+    return Bool_FromLong( type(w) == ZZ::gate_Buf );
 }
 
 ref<PyObject>

@@ -27,6 +27,7 @@ public:
     ref<PyObject> add_PI(PyObject* args);
     ref<PyObject> add_PO(PyObject* args, PyObject* kwds);
     ref<PyObject> add_Flop(PyObject* args, PyObject* kwds);
+    ref<PyObject> add_Buf();
 
     void add_property(PyObject* o);
     void add_constraint(PyObject* o);
@@ -36,6 +37,7 @@ public:
     ref<PyObject> n_PIs();
     ref<PyObject> n_POs();
     ref<PyObject> n_Flops();
+    ref<PyObject> n_Bufs();
     ref<PyObject> n_Ands();
 
     ref<PyObject> n_properties();
@@ -46,6 +48,7 @@ public:
     ref<PyObject> get_PIs();
     ref<PyObject> get_POs();
     ref<PyObject> get_Flops();
+    ref<PyObject> get_Bufs();
     ref<PyObject> get_Ands();
 
     ref<PyObject> get_properties();
@@ -61,6 +64,7 @@ public:
     ref<PyObject> uporder(PyObject* args);
 
     void remove_unreach();
+    void remove_bufs();
 
 public:
 

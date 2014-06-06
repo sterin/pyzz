@@ -243,6 +243,7 @@ Netlist::initialize(PyObject* module)
         PYTHONWRAPPER_METH_VARARGS( Netlist, add_PI, 0, ""),
         PYTHONWRAPPER_METH_KEYWORDS( Netlist, add_PO, 0, ""),
         PYTHONWRAPPER_METH_KEYWORDS( Netlist, add_Flop, 0, ""),
+        PYTHONWRAPPER_METH_NOARGS( Netlist, add_Buf, 0, ""),
 
         PYTHONWRAPPER_METH_O( Netlist, add_property, 0, ""),
         PYTHONWRAPPER_METH_O( Netlist, add_constraint, 0, ""),
@@ -252,6 +253,7 @@ Netlist::initialize(PyObject* module)
         PYTHONWRAPPER_METH_NOARGS( Netlist, get_PIs, 0, ""),
         PYTHONWRAPPER_METH_NOARGS( Netlist, get_POs, 0, ""),
         PYTHONWRAPPER_METH_NOARGS( Netlist, get_Flops, 0, ""),
+        PYTHONWRAPPER_METH_NOARGS( Netlist, get_Bufs, 0, ""),
         PYTHONWRAPPER_METH_NOARGS( Netlist, get_Ands, 0, ""),
 
         PYTHONWRAPPER_METH_NOARGS( Netlist, get_properties, 0, ""),
@@ -262,6 +264,7 @@ Netlist::initialize(PyObject* module)
         PYTHONWRAPPER_METH_NOARGS( Netlist, n_PIs, 0, ""),
         PYTHONWRAPPER_METH_NOARGS( Netlist, n_POs, 0, ""),
         PYTHONWRAPPER_METH_NOARGS( Netlist, n_Flops, 0, ""),
+        PYTHONWRAPPER_METH_NOARGS( Netlist, n_Bufs, 0, ""),
         PYTHONWRAPPER_METH_NOARGS( Netlist, n_Ands, 0, ""),
 
         PYTHONWRAPPER_METH_NOARGS( Netlist, n_properties, 0, ""),
@@ -274,6 +277,7 @@ Netlist::initialize(PyObject* module)
         PYTHONWRAPPER_METH_O( Netlist, uporder, 0, ""),
 
         PYTHONWRAPPER_METH_NOARGS( Netlist, remove_unreach, 0, ""),
+        PYTHONWRAPPER_METH_NOARGS( Netlist, remove_bufs, 0, ""),
 
         { NULL }  // sentinel
     };
@@ -399,6 +403,12 @@ Netlist::add_Flop(PyObject* args, PyObject* kwds)
     return Wire::build(ff);
 }
 
+ref<PyObject>
+Netlist::add_Buf()
+{
+    return Wire::build(N.add(ZZ::Buf_()));
+}
+
 void
 Netlist::add_property(PyObject* o)
 {
@@ -436,12 +446,19 @@ Netlist::add_fair_constraint(PyObject* o)
     Get_Pob(N, fair_constraints);
     fair_constraints.push(w.w);
 }
+
 void
 Netlist::remove_unreach()
 {
     Remove_Pob(N, strash);
     removeUnreach(N);
     Add_Pob0(N, strash);
+}
+
+void
+Netlist::remove_bufs()
+{
+    removeBuffers(N);
 }
 
 ref<PyObject>
@@ -460,6 +477,12 @@ ref<PyObject>
 Netlist::n_Flops()
 {
     return Int_FromSize_t(N.typeCount(ZZ::gate_Flop));
+}
+
+ref<PyObject>
+Netlist::n_Bufs()
+{
+    return Int_FromSize_t(N.typeCount(ZZ::gate_Buf));
 }
 
 ref<PyObject>
@@ -523,6 +546,16 @@ Netlist::get_Flops()
     ZZ::Vec<ZZ::Wire> vec;
 
     fill_gates(vec, N, ZZ::gate_Flop);
+
+    return VecIterator<Wire>::build(vec);
+}
+
+ref<PyObject>
+Netlist::get_Bufs()
+{
+    ZZ::Vec<ZZ::Wire> vec;
+
+    fill_gates(vec, N, ZZ::gate_Buf);
 
     return VecIterator<Wire>::build(vec);
 }
@@ -719,6 +752,11 @@ Netlist::copy()
             ZZ::Wire g1 = M[xlat[g[1]]];
 
             xlat(g) = ZZ::s_And(g0, g1);
+        }
+        else if( type(g) == ZZ::gate_Buf )
+        {
+            ZZ::Wire g0 = M[xlat[g[0]]];
+            xlat(g) = M.add( ZZ::Buf_(), g0);
         }
     }
 

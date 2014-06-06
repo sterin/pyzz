@@ -80,6 +80,8 @@ def get_coi(N, roots, stop_at):
         
         if w.is_Flop():
             dfs_stack.append(+w[0])
+        if w.is_Buf():
+            dfs_stack.append(+w[0])
         elif w.is_PO():
             dfs_stack.append(+w[0])
         elif w.is_And():
@@ -112,6 +114,8 @@ def topological_order(roots, stop_at = []):
             elif w.is_And():
                 dfs_stack.append(+w[0])
                 dfs_stack.append(+w[1])
+            elif w.is_Buf():
+                dfs_stack.append(+w[0])
 
 def copy_cone(N_src, N_dst, wires, stop_at={}):
 
@@ -142,6 +146,9 @@ def copy_cone(N_src, N_dst, wires, stop_at={}):
 
         elif w.is_PO():
             xlat[w] = N_dst.add_PO(fanin=xlat[w[0]])
+
+        elif w.is_Buf():
+            xlat[w] = xlat[w[0]]
 
     for w in flops:
         xlat[w][0] = xlat[w[0]]

@@ -35,6 +35,8 @@ def simulate_assignment(S, N, signals):
             res[w] = sv(w)
         elif w.is_Flop():
             res[w] = sv(w)
+        elif w.is_Buf():
+            res[w] = v(w[0])
         elif w.is_PO():
             res[w] = v(w[0])
         elif w.is_And():

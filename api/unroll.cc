@@ -158,6 +158,10 @@ Unroll::push_children(stack_elem e)
     {
         _dfs_stack.push( stack_elem(+w[0], e.k-1) );
     }
+    else if( ZZ::type(w) == ZZ::gate_Buf )
+    {
+        _dfs_stack.push( stack_elem(+w[0], e.k) );
+    }
     else if( ZZ::type(w) == ZZ::gate_PO )
     {
         _dfs_stack.push( stack_elem(+w[0], e.k) );
@@ -209,6 +213,11 @@ Unroll::unroll_wire(stack_elem e)
             M(w) = F[_maps[k-1][w[0]]];
             return;
         }
+    }
+    else if( ZZ::type(w) == ZZ::gate_Buf )
+    {
+        M(w) = F[M[w[0]]];
+        return;
     }
     else if( ZZ::type(w) == ZZ::gate_PO )
     {

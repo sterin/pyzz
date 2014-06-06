@@ -39,6 +39,7 @@ public:
     ref<PyObject> is_PI();
     ref<PyObject> is_And();
     ref<PyObject> is_Flop();
+    ref<PyObject> is_Buf();
     ref<PyObject> is_PO();
 
     ref<PyObject> id();
