@@ -5,7 +5,7 @@
 #include "ZZ_Netlist.hh"
 #include "ZZ_Bip.Common.hh"
 
-#include "pywrapper/src/pywrapper.h"
+#include "../../pywrapper/src/pywrapper.h"
 
 namespace pyzz
 {
@@ -33,7 +33,7 @@ extern PyObject* zz_error;
         PyErr_SetString(pyzz::zz_error, e.msg.c_str()); \
     }
 
-#include "pywrapper/src/pywrapper_types.h"
+#include "../../pywrapper/src/pywrapper_types.h"
 
 namespace pyzz
 {
