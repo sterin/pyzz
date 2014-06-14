@@ -10,7 +10,7 @@ if len(sys.argv) > 1:
   arg = sys.argv[1]
 
 if arg == 'clean':
-  os.system('../../BUILD/zb ,realclean')
+  os.system('../../abc-zz/BUILD/zb ,realclean')
   os.system('python setup.py develop --uninstall')
   shutil.rmtree('build', ignore_errors=True)
   shutil.rmtree('dist', ignore_errors=True)
@@ -33,7 +33,7 @@ else:
   os.putenv('PYZZ_ZB_CONFIG', 'release_i')
   zb_opt = 'ri'
 
-rc = os.system('../../BUILD/zb %s'%zb_opt)
+rc = os.system('../../abc-zz/BUILD/zb %s'%zb_opt)
 
 if rc != 0:
   sys.exit(rc)

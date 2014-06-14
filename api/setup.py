@@ -64,12 +64,12 @@ class build_ext_subclass( build_ext ):
         else:
             config = 'release_i'
 
-        library_dir = "../../lib/%s/%s"%(machine, config)
+        library_dir = "../../abc-zz/lib/%s/%s"%(machine, config)
 
         for ext in self.extensions:
             ext.library_dirs.append(library_dir)
 
-        args = ['../../BUILD/zz_gdep_link'] + self.compiler.compiler_cxx[1:]
+        args = ['../../abc-zz/BUILD/zz_gdep_link'] + self.compiler.compiler_cxx[1:]
         self.compiler.compiler_cxx = args
 
         return build_ext.build_extensions(self)
