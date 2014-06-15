@@ -56,6 +56,11 @@ public:
     ref<PyObject> get_fair_properties();
     ref<PyObject> get_fair_constraints();
 
+    void clear_properties();
+    void clear_constraints();
+    void clear_fair_properties();
+    void clear_fair_constraints();
+
     ref<PyObject> get_flop_init();
     ref<PyObject> get_names();
 

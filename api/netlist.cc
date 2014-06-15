@@ -261,6 +261,11 @@ Netlist::initialize(PyObject* module)
         PYTHONWRAPPER_METH_NOARGS( Netlist, get_fair_properties, 0, ""),
         PYTHONWRAPPER_METH_NOARGS( Netlist, get_fair_constraints, 0, ""),
 
+        PYTHONWRAPPER_METH_NOARGS( Netlist, clear_properties, 0, ""),
+        PYTHONWRAPPER_METH_NOARGS( Netlist, clear_constraints, 0, ""),
+        PYTHONWRAPPER_METH_NOARGS( Netlist, clear_fair_properties, 0, ""),
+        PYTHONWRAPPER_METH_NOARGS( Netlist, clear_fair_constraints, 0, ""),
+
         PYTHONWRAPPER_METH_NOARGS( Netlist, n_PIs, 0, ""),
         PYTHONWRAPPER_METH_NOARGS( Netlist, n_POs, 0, ""),
         PYTHONWRAPPER_METH_NOARGS( Netlist, n_Flops, 0, ""),
@@ -620,6 +625,35 @@ Netlist::get_fair_constraints()
     fair_constraints.copyTo(props);
 
     return VecIterator<Wire>::build(props);
+}
+
+void
+Netlist::clear_properties()
+{
+    Get_Pob(N, properties);
+    properties.clear();
+}
+
+
+void
+Netlist::clear_constraints()
+{
+    Get_Pob(N, constraints);
+    constraints.clear();
+}
+
+void
+Netlist::clear_fair_properties()
+{
+    Get_Pob(N, fair_properties);
+    fair_properties.clear();
+}
+
+void
+Netlist::clear_fair_constraints()
+{
+    Get_Pob(N, fair_constraints);
+    fair_constraints.clear();
 }
 
 ref<PyObject>
