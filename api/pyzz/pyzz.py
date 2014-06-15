@@ -5,6 +5,9 @@ from ._pyzz import *
 def all_signals(N):
     return itertools.chain( [N.get_True()], N.get_PIs(), N.get_Flops(), N.get_Ands(), N.get_POs() )
 
+def all_fcs_for_fair_po(N, fair_po_no):
+    return itertools.chain( N.get_fair_properties()[fair_po_no], N.get_fair_constraints() )
+
 def conjunction(N, wires):
 
     def helper(wires):
