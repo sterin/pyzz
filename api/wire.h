@@ -50,6 +50,8 @@ public:
     void mp_ass_subscript(PyObject* key, PyObject* val);
     ref<PyObject> mp_subscript(PyObject* o);
 
+    void remove();
+
     long tp_hash();
 
 public:

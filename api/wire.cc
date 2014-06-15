@@ -67,6 +67,8 @@ Wire::initialize(PyObject* module)
         PYTHONWRAPPER_METH_VARARGS(Wire, ite, 0, ""),
         PYTHONWRAPPER_METH_O(Wire, equals, 0, ""),
 
+        PYTHONWRAPPER_METH_NOARGS(Wire, remove, 0, ""),
+
         { NULL }  // sentinel
     };
 
@@ -242,6 +244,12 @@ Wire::mp_ass_subscript(PyObject* key, PyObject* val)
     Wire& ww = Wire::ensure(val);
 
     w.set(i, ww.w);
+}
+
+void
+Wire::remove()
+{
+    w.remove();
 }
 
 long
