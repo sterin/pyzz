@@ -158,13 +158,14 @@ def copy_cone(N_src, N_dst, wires, stop_at={}):
 
     return xlat
 
-def copy_coi(N, roots=None):
+def copy_coi(N, roots=None, M=None, stop_at={}):
 
-    M = netlist()
+    if M is None:
+        M = netlist()
 
     if roots is None:
         roots = list(N.get_POs())
 
-    xlat = copy_cone(N, M, roots)
+    xlat = copy_cone(N, M, roots, stop_at)
 
     return M, xlat
