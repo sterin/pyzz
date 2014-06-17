@@ -73,14 +73,14 @@ def get_coi(N, roots, stop_at):
         
         w = dfs_stack.pop()
         
+        if w in stop_at:
+            continue
+
         if w in visited:
             continue
             
         visited.add(w)
 
-        if w in stop_at:
-            continue
-        
         if w.is_Flop():
             dfs_stack.append(+w[0])
         if w.is_Buf():
