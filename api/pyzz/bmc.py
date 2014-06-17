@@ -105,21 +105,24 @@ def simple_safety_bmc(N, bad, constr, max, start_frame, handle_sat, handle_unsat
 
     return solver.UNDEF
 
-def safety_bmc(N, max, symbols=None, filter=filter_underscore, cex=True):
+def safety_bmc(N, max, symbols=None, filter=filter_underscore, cex=True, verbose=True):
 
     if symbols is None:
         symbols = make_symbols(N)
 
     def start_frame(U, S, frame):
-        print "frame %5d: "%frame,
+        if verbose:
+            print "frame %5d: "%frame,
 
     def handle_sat(U, S, frame):
-        print "SAT\n"
+        if verbose:
+            print "SAT\n"
         if cex:
             print_cex(U, S, symbols, filter=filter)
     
     def handle_unsat(U, S, frame):
-        print "UNSAT"
+        if verbose:
+            print "UNSAT"
 
     bad = [ ~po[0]^po.sign() for po in N.get_properties() ]
     constr = [ po[0]^po.sign() for po in N.get_constraints() ]
