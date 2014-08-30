@@ -2,6 +2,9 @@ import itertools
 
 from ._pyzz import *
 
+SAT_VALUES = [ 'UNKNOWN', 'ERROR', 'UNSAT', 'SAT']
+L_VALUES = [ 'l_Unknown', 'l_Error', 'l_False', 'l_True']
+
 def all_signals(N):
     return itertools.chain( [N.get_True()], N.get_PIs(), N.get_Flops(), N.get_Ands(), N.get_POs() )
 
@@ -169,3 +172,4 @@ def copy_coi(N, roots=None, M=None, stop_at={}):
     xlat = copy_cone(N, M, roots, stop_at)
 
     return M, xlat
+
