@@ -80,6 +80,65 @@ imc(PyObject* args, PyObject* kwds)
     return BuildValue("ii", res.value, buf_free_depth);
 }
 
+ref<PyObject>
+pdr(PyObject* args, PyObject* kwds)
+{
+    static char *kwlist[] = { "N", "props", "first_k", "quiet", NULL };
+
+    borrowed_ref<PyObject> pN;
+    borrowed_ref<PyObject> pyprops;
+    int first_k = 0;
+    int quiet = 1;
+    Arg_ParseTupleAndKeywords(args, kwds, "O|Oii:imc", kwlist, &pN, &pyprops, &first_k, &quiet);
+
+    if( first_k < 0)
+    {
+        first_k = 0;
+    }
+
+    Netlist& N = Netlist::ensure(pN);
+
+    ZZ::Vec<ZZ::Wire> props;
+
+    if( pyprops )
+    {
+        pywrapper_for_iterator(pyprops, pyitem)
+        {
+            Wire& ww = Wire::ensure(pyitem);
+            props.push(ww.w);
+        }
+    }
+    else
+    {
+        ZZ::Vec<ZZ::Wire> pos;
+        fill_gates(pos, N.N, ZZ::gate_PO);
+
+        for(uind i=0; i<pos.size() ; i++)
+        {
+            props.push( ~pos[i] );
+        }
+    }
+
+    int buf_free_depth = -1;
+
+    ZZ::Params_Pdr params;
+
+    //params.minimal_cex = first_k;
+    params.quiet = quiet;
+
+    ZZ::lbool res = ZZ::propDrivenReach(
+        N.N,
+        props,
+        params,
+        0,
+        ZZ::NetlistRef(),
+        &buf_free_depth,
+        0
+        );
+
+    return BuildValue("ii", res.value, buf_free_depth);
+}
+
 void
 init()
 {
@@ -96,6 +155,7 @@ init()
 
     static PyMethodDef pyzz_methods[] = {
         PYTHONWRAPPER_FUNC_KEYWORDS(imc, 0, "interpolation-based model-checking"),
+        PYTHONWRAPPER_FUNC_KEYWORDS(pdr, 0, "property-directed-reachability"),
         { 0 }
     };
 
