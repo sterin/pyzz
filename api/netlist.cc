@@ -757,14 +757,15 @@ Netlist::copy()
         xlat(pi) = M.add(ZZ::PI_(id));
     }
 
-    Get_Pob(M, flop_init);
+    Get_Pob(N, flop_init);
+    Get_Pob2(M, flop_init, M_flop_init);
 
     For_Gatetype(N, ZZ::gate_Flop, ff)
     {
         int id = M.typeCount(ZZ::gate_Flop);
         ZZ::Wire mff = M.add(ZZ::Flop_(id));
         xlat(ff) = mff;
-        flop_init(mff) = flop_init[ff];
+        M_flop_init(mff) = flop_init[ff];
     }
 
     ZZ::Vec<ZZ::gate_id> and_order;
