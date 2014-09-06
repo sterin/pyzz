@@ -184,6 +184,7 @@ Boolean operation over a more than two wire:
 
 A simple example that writes an AIG with to PIs, and the PO is the AND of these two PIs:
 
+    :::python
     from pyzz import *
     
     N = netlist() # construct a netlist
@@ -200,6 +201,7 @@ A simple example that writes an AIG with to PIs, and the PO is the AND of these 
 
 Another example, but this time using utility functions:
 
+    :::python
     from pyzz import *
     
     N = netlist() # construct a netlist
@@ -212,6 +214,7 @@ Another example, but this time using utility functions:
 
 A simple BMC
 
+    :::python
     def bmc(N, max):
     
         # create an unroll object with the Flops initialized in the first frame
@@ -232,8 +235,5 @@ A simple BMC
     
             if rc == solver.SAT:
                 return solver.SAT
-    
-            elif rc == solver.UNSAT:
-                print "UNSAT"
     
         return solver.UNDEF
