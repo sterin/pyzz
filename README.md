@@ -132,6 +132,13 @@ The result of the result can be one of
 * `pyzz.netlist.l_False`: the value of `w` in the satisfying assignment is false
 * `pyzz.netlist.l_Unknown`: the value of `w` in the satisfying assignment is not specified (e.g. the wire was not in the cone of the query)
 
+Additional constraints can be added to the solver
+
+* `S.clause( wires )`: adds the clause `wires` to the solver
+* `S.cube( wires )`: adds the cube `wires` to the solver (the same as adding each wire as a unit clause)
+* `S.implication( w1, w2 )`: adds `w1` implies `w2` to the solver
+* `S.equivalence( w1, w2 )`: adds the`w1` iff `w2` to the solver
+
 ## Unroll
 
 The Unroll object unrolls a netlist in time.
@@ -139,6 +146,10 @@ The Unroll object unrolls a netlist in time.
 The unroll object is created over a netlist
 
     U = pyzz.unroll(N)
+
+By default, the Flops are initialized in the first frame. It can be modified to implement algorithms that requires that (e.g. inductive step)
+
+    U = pyzz.unroll(N, init=False)
 
 The unroll object has two data members
 
@@ -171,6 +182,8 @@ Boolean operation over a more than two wire:
 
 # Examples
 
+A simple example that writes an AIG with to PIs, and the PO is the AND of these two PIs:
+
     from pyzz import *
     
     N = netlist() # construct a netlist
@@ -185,14 +198,43 @@ Boolean operation over a more than two wire:
 
     N.write_aiger('test1.aig')
 
+Another example, but this time using utility functions:
 
     from pyzz import *
     
     N = netlist() # construct a netlist
     
-    wires [ N.add_PI() for _ in xrange(10) ] # create 10 new PIs
+    wires = [ N.add_PI() for _ in xrange(10) ] # create 10 new PIs
 
     po2 = N.add_PO(fanin=conjunction(N, wires)) # creates a new PO whose fanin is the conjunction of all the PIs
     
     N.write_aiger('test2.aig')
+
+A simple BMC
+
+def bmc(N, max):
+    
+        # create an unroll object with the Flops initialized in the first frame
+        U = unroll(N, init=True)
+    
+        # create a solver of the unrolled netlist
+        S = solver(U.F)
+    
+        prop = conjunction( N, N.get_properties() ) # conjunction of the properties
+        constr = conjunction( N, N.get_constraints() ) # conjunction of the constraints
+    
+        for i in xrange(max):
+    
+            fprop = U[prop, i] # unroll prop to frame i
+            S.cube( U[constr, i] ) # unroll the constraits to frame i
+    
+            rc = S.solve( ~prop ) # run the solver
+    
+            if rc == solver.SAT:
+                return solver.SAT
+    
+            elif rc == solver.UNSAT:
+                print "UNSAT"
+    
+        return solver.UNDEF
 
