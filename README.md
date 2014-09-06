@@ -182,14 +182,17 @@ Boolean operation over a more than two wire:
     po1[0] = w1 & w2 # set the fanin of the PO to w1&w2
 
     po2 = N.add_PO(fanin=w1&w2) # similar to above, but sets the fanin during construction
-    
-    N.write_aiger('test.aig')
+
+    N.write_aiger('test1.aig')
 
 
+    from pyzz import *
     
+    N = netlist() # construct a netlist
     
+    wires [ N.add_PI() for _ in xrange(10) ] # create 10 new PIs
+
+    po2 = N.add_PO(fanin=conjunction(N, wires)) # creates a new PO whose fanin is the conjunction of all the PIs
     
-    
-    
-    
+    N.write_aiger('test2.aig')
 
