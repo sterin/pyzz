@@ -212,7 +212,7 @@ Another example, but this time using utility functions:
 
 A simple BMC
 
-def bmc(N, max):
+    def bmc(N, max):
     
         # create an unroll object with the Flops initialized in the first frame
         U = unroll(N, init=True)
@@ -237,4 +237,3 @@ def bmc(N, max):
                 print "UNSAT"
     
         return solver.UNDEF
-
