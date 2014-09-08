@@ -182,7 +182,7 @@ Boolean operation over a more than two wire:
 
 Functions for compositions:
 
-* `pyzz.copy_cone(N_src, N_dst, wires, stop_at={}): copies the cone of `wires` from the source to the destination netlist. `stop_at` is a mapping from nodes in the source netlist to the destination netlist. If during the traversal of the source netlist a wire in stop_at is encountered, it is replaced by the wire it is mapped to.
+* `pyzz.copy_cone(N_src, N_dst, wires, stop_at={})`: copies the cone of `wires` from the source to the destination netlist. `stop_at` is a mapping from nodes in the source netlist to the destination netlist. If during the traversal of the source netlist a wire in `stop_at` is encountered, it is replaced by the wire it is mapped to.
 
 # Examples
 
