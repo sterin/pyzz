@@ -173,3 +173,17 @@ def copy_coi(N, roots=None, M=None, stop_at={}):
 
     return M, xlat
 
+def combine_cones(*netlists):
+    "create a new netlist and copy '*netlists' into it, mapping the PIs of all nelists to a single set of PIs"
+
+    assert len(netlists)>0
+
+    n_pis = max( M.n_PIs() for M in netlists )
+
+    N = netlist()
+
+    pis = [ N.add_PI() for _ in xrange(n_pis) ]
+
+    xlats = [ copy_cone(M, N, [po[0] for po in M.get_POs()], stop_at=dict(zip(M.get_PIs(), pis))) for M in netlists ]
+
+    return N, xlats
