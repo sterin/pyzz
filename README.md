@@ -183,6 +183,7 @@ Boolean operation over a more than two wire:
 Functions for compositions:
 
 * `pyzz.copy_cone(N_src, N_dst, wires, stop_at={})`: copies the cone of `wires` from the source to the destination netlist. `stop_at` is a mapping from nodes in the source netlist to the destination netlist. If during the traversal of the source netlist a wire in `stop_at` is encountered, it is replaced by the wire it is mapped to.
+* `pyzz.combine_cones(N1, N2, ...)`: copies the netlists N1, N2, ... into a new netlist N and return `N, (xlat1, xlat2, ...)` where `xlat1`, `xlat2`,... map from N1 to N, etc.
 
 # Examples
 
@@ -219,50 +220,32 @@ Another example, but this time using utility functions:
 A simple combinational equivalence checker:
 
     :::python
-    import pyzz
-    
-    # copy N1 and N2 to a new network, with a sinlge set of PIs for both
-    def pre_miter(N1, N2):
-    
-        # ensure that both netlists have the same number of PIs
-        assert N1.n_PIs()==N2.n_PIs()
-    
-        # ensure that both netlists have the same number of POs
-        assert N1.n_POs()==N2.n_POs()
-    
-        # make sure that both neslists are combinational
-        assert N1.n_Flops()==N2.n_Flops()==0
-    
-        # create the new miter netlist
-        N = pyzz.netlist()
-    
-        # create PIs
-        pis = [ N.add_PI() for _ in xrange(N1.n_PIs()) ]
-    
-        # copy the cone of th POs from N1 to N, using 'pis' to replace the original PIs
-        xlat1 = pyzz.copy_cone(N1, N, [po[0] for po in N1.get_POs()], stop_at=dict(zip(N1.get_PIs(), pis)))
-    
-        # copy the cone of th POs from N2 to N, using 'pis' to replace the original PIs
-        xlat2 = pyzz.copy_cone(N2, N, [po[0] for po in N2.get_POs()], stop_at=dict(zip(N2.get_PIs(), pis)))
-    
-        # return the netlist a list of wire pairs. each pair is the copy of an PO from N1 and N2
-        return N, zip( (xlat1[po[0]] for po in N1.get_POs()), (xlat2[po[0]] for po in N2.get_POs()) )
-    
-    # build miters for each PO pair
     def build_miters(N1, N2):
-    
-        N, pairs = pre_miter(N1, N2)
-        return N, [ f1^f2  for f1, f2 in pairs ]
-    
+
+        N, (xlat1, xlat2) = pyzz.combine_cones(N1, N2)
+
+        N1_pos = [ xlat1[po[0]] for po in N1.get_POs() ]
+        N2_pos = [ xlat2[po[0]] for po in N2.get_POs() ]
+
+        return N, [ f1^f2 for f1, f2 in zip(N1_pos, N2_pos) ]
+
     def CEC(N1, N2):
-    
+
         # build miters for the POs
         N, miters = build_miters(N1, N2)
-    
+
         S = pyzz.solver(N)
-    
-        for f in miters:
-            yield S.solve(f), S, N
+
+        for i, f in enumerate(miters):
+
+            rc = S.solve(f)
+
+            if rc==pyzz.solver.UNSAT:
+                print 'Output %d is equivalent'%i
+            elif rc==pyzz.solver.SAT:
+                print 'Output %d is not equivalent'%i
+            else:
+                print 'Could not prove output %d'%i
 
 A simple BMC
 
