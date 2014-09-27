@@ -71,8 +71,8 @@ A wire represents a, possibly complemented, AIG node.
 * `+w`: returns the non-complemented version of a wire
 * `w.sign()`: returns whether the wire is complemented
 * `w1 & w2`: returns the AND of two wires
-* `w1 | w2`: returns the AND of two wires
-* `w1 ^ w2`: returns the AND of two wires
+* `w1 | w2`: returns the OR of two wires
+* `w1 ^ w2`: returns the XOR of two wires
 * `w1.implies(w2)`: returns a wire that is true if `w1` implies `w2`
 * `w1.equals(w2)`: returns a wire that is true if `w1` equals `w2`
 * `w_if.ite(w_then, w_else)`: returns the ITE of the three wires
