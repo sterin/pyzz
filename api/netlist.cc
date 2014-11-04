@@ -380,11 +380,12 @@ Netlist::add_Flop(PyObject* args, PyObject* kwds)
 {
     int id = N.typeCount(ZZ::gate_Flop);
 
-    static char *kwlist[] = { "id", "init", NULL };
+    static char *kwlist[] = { "id", "init", "next", NULL };
 
     borrowed_ref<PyObject> init;
+    borrowed_ref<PyObject> next;
 
-    Arg_ParseTupleAndKeywords(args, kwds, "|iO", kwlist, &id, &init);
+    Arg_ParseTupleAndKeywords(args, kwds, "|iOO", kwlist, &id, &init, &next);
 
     ZZ::lbool init_value = ZZ::l_False;
 
@@ -404,6 +405,12 @@ Netlist::add_Flop(PyObject* args, PyObject* kwds)
 
     Get_Pob(N, flop_init);
     flop_init(ff) = init_value;
+
+    if ( next )
+    {
+        Wire& nw = Wire::ensure(next);
+        ff.set(0, nw.w);
+    }
 
     return Wire::build(ff);
 }

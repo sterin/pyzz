@@ -34,6 +34,7 @@ extern PyObject* zz_error;
     }
 
 #include "../../pywrapper/src/pywrapper_types.h"
+#include "../../pywrapper/src/pywrapper_thread.h"
 
 namespace pyzz
 {
