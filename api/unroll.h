@@ -34,6 +34,7 @@ public:
     static void construct(Unroll* p, PyObject* args, PyObject*);
 
     Py_ssize_t mp_length();
+    void mp_ass_subscript(PyObject* key, PyObject* val);
     ref<PyObject> mp_subscript(PyObject* o);
     int sq_contains(PyObject* pkey);
 

@@ -44,6 +44,7 @@ Unroll::initialize(PyObject* module)
 {
     static PyMappingMethods as_mapping = { 0 };
     as_mapping.mp_subscript = wrappers::binaryfunc<Unroll, &Unroll::mp_subscript>;
+    as_mapping.mp_ass_subscript = wrappers::mp_ass_subscript<Unroll, &Unroll::mp_ass_subscript>;
     as_mapping.mp_length = wrappers::mp_length<Unroll, &Unroll::mp_length>;
     _type.tp_as_mapping = &as_mapping;
 
@@ -67,6 +68,29 @@ Unroll::mp_length()
 {
     return _maps.size();
 }
+
+void
+Unroll::mp_ass_subscript(PyObject* key, PyObject* val)
+{
+    int k;
+    borrowed_ref<PyObject> o;
+
+    Arg_ParseTuple(key, "Oi", &o, &k);
+
+    Wire& w = Wire::ensure(o);
+    Wire& fw = Wire::ensure(val);
+
+    if ( w.w.nl() != N.nl() || fw.w.nl() != F.nl() )
+    {
+        exception::format(zz_error, "netlist mismatch.");
+    }
+
+    ensure_frame(k);
+    _maps[k](+w.w) = fw.w ^ w.w.sign() ;
+
+    visit(stack_elem(+w.w, k));
+}
+
 
 ref<PyObject>
 Unroll::mp_subscript(PyObject* args)
