@@ -23,6 +23,7 @@ public:
     void write(PyObject* args);
 
     ref<PyObject> get_True();
+    ref<PyObject> get_False();
 
     ref<PyObject> add_PI();
     ref<PyObject> add_PO(PyObject* args, PyObject* kwds);

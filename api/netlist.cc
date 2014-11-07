@@ -269,6 +269,7 @@ Netlist::initialize(PyObject* module)
         PYTHONWRAPPER_METH_O( Netlist, write, 0, ""),
 
         PYTHONWRAPPER_METH_NOARGS( Netlist, get_True, 0, ""),
+        PYTHONWRAPPER_METH_NOARGS( Netlist, get_False, 0, ""),
 
         PYTHONWRAPPER_METH_NOARGS( Netlist, add_PI, 0, ""),
         PYTHONWRAPPER_METH_KEYWORDS( Netlist, add_PO, 0, ""),
@@ -373,6 +374,12 @@ ref<PyObject>
 Netlist::get_True()
 {
     return Wire::build(N.True());
+}
+
+ref<PyObject>
+Netlist::get_False()
+{
+    return Wire::build(~N.True());
 }
 
 ref<PyObject>
