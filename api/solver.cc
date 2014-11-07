@@ -165,7 +165,7 @@ Solver::mp_subscript(PyObject* o)
         vec.push( vw );
     }
 
-    return VecIterator<lbool_proxy>::build(vec);
+    return Vec<lbool_proxy>::build(vec);
 }
 
 int

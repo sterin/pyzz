@@ -110,7 +110,7 @@ Unroll::mp_subscript(PyObject* args)
             vec.push( unroll(w.w, k) );
         }
 
-        return VecIterator<Wire>::build(vec);
+        return Vec<Wire>::build(vec);
     }
     catch( exception& e )
     {

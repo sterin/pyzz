@@ -565,7 +565,7 @@ Netlist::get_PIs()
 
     fill_gates(vec, N, ZZ::gate_PI);
 
-    return VecIterator<Wire>::build(vec);
+    return Vec<Wire>::build(vec);
 }
 
 ref<PyObject>
@@ -575,7 +575,7 @@ Netlist::get_POs()
 
     fill_gates(vec, N, ZZ::gate_PO);
 
-    return VecIterator<Wire>::build(vec);
+    return Vec<Wire>::build(vec);
 }
 
 ref<PyObject>
@@ -585,7 +585,7 @@ Netlist::get_Flops()
 
     fill_gates(vec, N, ZZ::gate_Flop);
 
-    return VecIterator<Wire>::build(vec);
+    return Vec<Wire>::build(vec);
 }
 
 ref<PyObject>
@@ -595,7 +595,7 @@ Netlist::get_Bufs()
 
     fill_gates(vec, N, ZZ::gate_Buf);
 
-    return VecIterator<Wire>::build(vec);
+    return Vec<Wire>::build(vec);
 }
 
 ref<PyObject>
@@ -605,7 +605,7 @@ Netlist::get_Ands()
 
     fill_gates(vec, N, ZZ::gate_And);
 
-    return VecIterator<Wire>::build(vec);
+    return Vec<Wire>::build(vec);
 }
 
 ref<PyObject>
@@ -616,7 +616,7 @@ Netlist::get_properties()
     ZZ::Vec<ZZ::Wire> props;
     properties.copyTo(props);
 
-    return VecIterator<Wire>::build(props);
+    return Vec<Wire>::build(props);
 }
 
 
@@ -628,7 +628,7 @@ Netlist::get_constraints()
     ZZ::Vec<ZZ::Wire> props;
     constraints.copyTo(props);
 
-    return VecIterator<Wire>::build(props);
+    return Vec<Wire>::build(props);
 }
 
 ref<PyObject>
@@ -643,7 +643,7 @@ Netlist::get_fair_properties()
     for( uind i=0; i<fair_properties.size() ; i++)
     {
         fair_properties[i].copyTo(props);
-        List_SetItem(list, i, VecIterator<Wire>::build(props));
+        List_SetItem(list, i, Vec<Wire>::build(props));
     }
 
     return list;
@@ -657,7 +657,7 @@ Netlist::get_fair_constraints()
     ZZ::Vec<ZZ::Wire> props;
     fair_constraints.copyTo(props);
 
-    return VecIterator<Wire>::build(props);
+    return Vec<Wire>::build(props);
 }
 
 void
@@ -883,7 +883,7 @@ Netlist::uporder(PyObject* seq)
         worder.push( N[order[i]] );
     }
 
-    return VecIterator<Wire>::build(worder);
+    return Vec<Wire>::build(worder);
 }
 
 } // namespace pyzz

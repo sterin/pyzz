@@ -176,7 +176,11 @@ init()
     WMap<Wire>::initialize(mod,"_pyzz.wwmap", "wwmap");
     WMap<Lit>::initialize(mod,"_pyzz.wlmap", "wlmap");
     VecIterator<Wire>::initialize(mod, "_pyzz.witerator", "witerator");
-    VecIterator<lbool_proxy>::initialize(mod, "_pyzz.lbooliterator", "lbooliterator");
+    Vec<Wire>::initialize(mod, "_pyzz.wvec", "wvec");
+    VecRef<Wire>::initialize(mod, "_pyzz.wvecref", "wvecref");
+    VecIterator<lbool_proxy>::initialize(mod, "_pyzz.witerator", "witerator");
+    Vec<lbool_proxy>::initialize(mod, "_pyzz.lboolvec", "lboolvec");
+    VecRef<lbool_proxy>::initialize(mod, "_pyzz.lboolvecref", "lboolvecref");
     Netlist::initialize(mod);
     Solver::initialize(mod);
     Unroll::initialize(mod);
