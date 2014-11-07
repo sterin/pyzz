@@ -34,6 +34,13 @@ public:
         base::_type.tp_iter = wrappers::unaryfunc<C,&C::tp_iter>;
         base::_type.tp_iternext = wrappers::unaryfunc<C,&C::tp_iternext>;
 
+        static PyMappingMethods as_mapping = { 0 };
+
+        as_mapping.mp_subscript = wrappers::binaryfunc<C, &C::mp_subscript>;
+        as_mapping.mp_length = wrappers::mp_length<C, &C::mp_length>;
+
+        base::_type.tp_as_mapping = &as_mapping;
+
         base::initialize(mname);
         base::add_to_module(module, name);
     }
@@ -51,6 +58,23 @@ public:
         }
 
         return pytype::build( _vec[_i++] );
+    }
+
+    ref<PyObject> mp_subscript(PyObject* o)
+    {
+        uind i = Int_AsLong(o);
+
+        if( _i >= _vec.size() )
+        {
+            throw exception(PyExc_KeyError);
+        }
+
+        return pytype::build( _vec[i] );
+    }
+
+    Py_ssize_t mp_length()
+    {
+        return _vec.size();
     }
 
 private:
