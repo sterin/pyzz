@@ -57,6 +57,9 @@ public:
 public:
 
     ZZ::Wire w;
+
+private:
+    void ensure_netlist(ZZ::Wire w);
 };
 
 } // namesapce pyzz

@@ -123,6 +123,7 @@ ref<PyObject>
 Wire::nb_and(PyObject* o)
 {
     Wire& rhs = Wire::ensure(o);
+    ensure_netlist(rhs.w);
 
     return build(s_And(w, rhs.w));
 }
@@ -131,6 +132,7 @@ ref<PyObject>
 Wire::nb_or(PyObject* o)
 {
     Wire& rhs = Wire::ensure(o);
+    ensure_netlist(rhs.w);
 
     return build(s_Or(w, rhs.w));
 }
@@ -141,6 +143,8 @@ Wire::nb_xor(PyObject* o)
     if ( Wire::check(o) )
     {
         Wire& rhs = Wire::ensure(o);
+        ensure_netlist(rhs.w);
+
         return build(s_Xor(w, rhs.w));
     }
 
@@ -156,6 +160,8 @@ ref<PyObject>
 Wire::implies(PyObject* o)
 {
     Wire& rhs = Wire::ensure(o);
+    ensure_netlist(rhs.w);
+
     return build( s_Or( ~w, rhs.w) ) ;
 }
 
@@ -166,7 +172,10 @@ Wire::ite(PyObject* args)
     Arg_ParseTuple(args, "OO", &T, &E);
 
     Wire& wT = Wire::ensure(T);
+    ensure_netlist(wT.w);
+
     Wire& wE = Wire::ensure(E);
+    ensure_netlist(wE.w);
 
     return build( s_Or( s_And(w, wT.w), s_And(~w, wE.w) ) ) ;
 }
@@ -175,6 +184,8 @@ ref<PyObject>
 Wire::equals(PyObject* o)
 {
     Wire& rhs = Wire::ensure(o);
+    ensure_netlist(rhs.w);
+
     return build( s_Equiv(w, rhs.w) ) ;
 }
 
@@ -242,6 +253,7 @@ Wire::mp_ass_subscript(PyObject* key, PyObject* val)
 {
     int i = Int_AsLong(key);
     Wire& ww = Wire::ensure(val);
+    ensure_netlist(ww.w);
 
     w.set(i, ww.w);
 }
@@ -258,5 +270,15 @@ Wire::tp_hash()
     // TODO: make sure a negative number is not returned.
     return w.hash();
 }
+
+void
+Wire::ensure_netlist(ZZ::Wire ww)
+{
+    if( ww.nl() != w.nl() )
+    {
+        throw exception(zz_error, "netlist mismatch");
+    }
+}
+
 
 } // namespace pyzz

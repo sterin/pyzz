@@ -78,6 +78,7 @@ public:
 private:
 
     void assure_pobs();
+    void ensure_netlist(ZZ::Wire w);
 
     void copy_props(ZZ::Netlist& M, const ZZ::WWMap& xlat);
     void copy_names(ZZ::Netlist& M, const ZZ::WWMap& xlat);

@@ -228,6 +228,15 @@ Netlist::assure_pobs()
 }
 
 void
+Netlist::ensure_netlist(ZZ::Wire w)
+{
+    if ( w.nl() != N.nl() )
+    {
+        throw exception(zz_error, "netlist mismatch");
+    }
+}
+
+void
 Netlist::initialize(PyObject* module)
 {
     static PyMethodDef methods[] = {
@@ -365,6 +374,7 @@ Netlist::add_PO(PyObject* args, PyObject* kwds)
     if( fanin )
     {
         Wire& fi = Wire::ensure(fanin);
+        ensure_netlist(fi.w);
 
         ZZ::Wire po = N.add(ZZ::PO_(id));
         po.set(0, fi.w);
@@ -401,6 +411,15 @@ Netlist::add_Flop(PyObject* args, PyObject* kwds)
         init_value = ZZ::lbool_new(val);
     }
 
+
+    Wire* nw = nullptr;
+
+    if (next)
+    {
+        nw = &Wire::ensure(next);
+        ensure_netlist(nw->w);
+    }
+
     ZZ::Wire ff = N.add(ZZ::Flop_(id));
 
     Get_Pob(N, flop_init);
@@ -408,8 +427,7 @@ Netlist::add_Flop(PyObject* args, PyObject* kwds)
 
     if ( next )
     {
-        Wire& nw = Wire::ensure(next);
-        ff.set(0, nw.w);
+        ff.set(0, nw->w);
     }
 
     return Wire::build(ff);
@@ -425,6 +443,7 @@ void
 Netlist::add_property(PyObject* o)
 {
     Wire& w = Wire::ensure(o);
+    ensure_netlist(w.w);
 
     Get_Pob(N, properties);
     properties.push(w.w);
@@ -434,6 +453,7 @@ void
 Netlist::add_constraint(PyObject* o)
 {
     Wire& w = Wire::ensure(o);
+    ensure_netlist(w.w);
 
     Get_Pob(N, constraints);
     constraints.push(w.w);
@@ -445,6 +465,11 @@ Netlist::add_fair_property(PyObject* o)
     ZZ::Vec<ZZ::Wire> fcs;
     zzvec_from_iter<Wire>(fcs, o);
 
+    for(uind i=0 ; i<fcs.size() ; i++)
+    {
+        ensure_netlist(fcs[i]);
+    }
+
     Get_Pob(N, fair_properties);
     fair_properties.push();
     fcs.copyTo(fair_properties.last());
@@ -454,6 +479,7 @@ void
 Netlist::add_fair_constraint(PyObject* o)
 {
     Wire& w = Wire::ensure(o);
+    ensure_netlist(w.w);
 
     Get_Pob(N, fair_constraints);
     fair_constraints.push(w.w);
