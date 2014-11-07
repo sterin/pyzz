@@ -24,7 +24,7 @@ public:
 
     ref<PyObject> get_True();
 
-    ref<PyObject> add_PI(PyObject* args);
+    ref<PyObject> add_PI();
     ref<PyObject> add_PO(PyObject* args, PyObject* kwds);
     ref<PyObject> add_Flop(PyObject* args, PyObject* kwds);
     ref<PyObject> add_Buf();

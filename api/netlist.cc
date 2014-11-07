@@ -270,7 +270,7 @@ Netlist::initialize(PyObject* module)
 
         PYTHONWRAPPER_METH_NOARGS( Netlist, get_True, 0, ""),
 
-        PYTHONWRAPPER_METH_VARARGS( Netlist, add_PI, 0, ""),
+        PYTHONWRAPPER_METH_NOARGS( Netlist, add_PI, 0, ""),
         PYTHONWRAPPER_METH_KEYWORDS( Netlist, add_PO, 0, ""),
         PYTHONWRAPPER_METH_KEYWORDS( Netlist, add_Flop, 0, ""),
         PYTHONWRAPPER_METH_NOARGS( Netlist, add_Buf, 0, ""),
@@ -376,14 +376,9 @@ Netlist::get_True()
 }
 
 ref<PyObject>
-Netlist::add_PI(PyObject* args)
+Netlist::add_PI()
 {
-    int id = N.typeCount(ZZ::gate_PI);
-
-    Arg_ParseTuple(args, "|i", &id);
-
-    ZZ::Wire pi = N.add(ZZ::PI_(id));
-
+    ZZ::Wire pi = N.add(ZZ::PI_(N.typeCount(ZZ::gate_PI)));
     _PIs.push(pi);
 
     return Wire::build(pi);
@@ -392,13 +387,13 @@ Netlist::add_PI(PyObject* args)
 ref<PyObject>
 Netlist::add_PO(PyObject* args, PyObject* kwds)
 {
-    int id = N.typeCount(ZZ::gate_PO);
+    const int id = N.typeCount(ZZ::gate_PO);
 
-    static char *kwlist[] = { "id", "fanin", NULL };
+    static char *kwlist[] = { "fanin", NULL };
 
     borrowed_ref<PyObject> fanin;
 
-    Arg_ParseTupleAndKeywords(args, kwds, "|iO", kwlist, &id, &fanin);
+    Arg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &fanin);
 
     if( fanin )
     {
@@ -424,12 +419,12 @@ Netlist::add_Flop(PyObject* args, PyObject* kwds)
 {
     int id = N.typeCount(ZZ::gate_Flop);
 
-    static char *kwlist[] = { "id", "init", "next", NULL };
+    static char *kwlist[] = { "init", "next", NULL };
 
     borrowed_ref<PyObject> init;
     borrowed_ref<PyObject> next;
 
-    Arg_ParseTupleAndKeywords(args, kwds, "|iOO", kwlist, &id, &init, &next);
+    Arg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist, &init, &next);
 
     ZZ::lbool init_value = ZZ::l_False;
 
