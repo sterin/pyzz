@@ -224,6 +224,27 @@ Netlist::assure_pobs()
     Assure_Pob0(N, fair_properties);
     Assure_Pob0(N, fair_constraints);
 
+    _PIs.clear();
+
+    For_Gatetype(N, ZZ::gate_PI, pi)
+    {
+        _PIs.push(pi);
+    }
+
+    _POs.clear();
+
+    For_Gatetype(N, ZZ::gate_PO, po)
+    {
+        _POs.push(po);
+    }
+
+    _Flops.clear();
+
+    For_Gatetype(N, ZZ::gate_Flop, ff)
+    {
+        _Flops.push(ff);
+    }
+
     //N.names().enableLookup();
 }
 
@@ -258,6 +279,10 @@ Netlist::initialize(PyObject* module)
         PYTHONWRAPPER_METH_O( Netlist, add_constraint, 0, ""),
         PYTHONWRAPPER_METH_O( Netlist, add_fair_property, 0, ""),
         PYTHONWRAPPER_METH_O( Netlist, add_fair_constraint, 0, ""),
+
+        PYTHONWRAPPER_METH_O( Netlist, get_PI, 0, ""),
+        PYTHONWRAPPER_METH_O( Netlist, get_PO, 0, ""),
+        PYTHONWRAPPER_METH_O( Netlist, get_Flop, 0, ""),
 
         PYTHONWRAPPER_METH_NOARGS( Netlist, get_PIs, 0, ""),
         PYTHONWRAPPER_METH_NOARGS( Netlist, get_POs, 0, ""),
@@ -357,7 +382,11 @@ Netlist::add_PI(PyObject* args)
 
     Arg_ParseTuple(args, "|i", &id);
 
-    return Wire::build(N.add(ZZ::PI_(id)));
+    ZZ::Wire pi = N.add(ZZ::PI_(id));
+
+    _PIs.push(pi);
+
+    return Wire::build(pi);
 }
 
 ref<PyObject>
@@ -377,12 +406,17 @@ Netlist::add_PO(PyObject* args, PyObject* kwds)
         ensure_netlist(fi.w);
 
         ZZ::Wire po = N.add(ZZ::PO_(id));
+        _POs.push(po);
+
         po.set(0, fi.w);
 
         return Wire::build(po);
     }
 
-    return Wire::build(N.add(ZZ::PO_(id)));
+    ZZ::Wire po = N.add(ZZ::PO_(id));
+    _POs.push(po);
+
+    return Wire::build(po);
 }
 
 ref<PyObject>
@@ -421,6 +455,7 @@ Netlist::add_Flop(PyObject* args, PyObject* kwds)
     }
 
     ZZ::Wire ff = N.add(ZZ::Flop_(id));
+    _Flops.push(ff);
 
     Get_Pob(N, flop_init);
     flop_init(ff) = init_value;
@@ -490,7 +525,8 @@ Netlist::remove_unreach()
 {
     Remove_Pob(N, strash);
     removeUnreach(N);
-    Add_Pob0(N, strash);
+
+    assure_pobs();
 }
 
 void
@@ -559,33 +595,60 @@ Netlist::n_fair_constraints()
 }
 
 ref<PyObject>
+Netlist::get_PI(PyObject* o)
+{
+    uind i = Int_AsSsize_t(o);
+
+    if( i>=_PIs.size() )
+    {
+        throw exception(PyExc_KeyError);
+    }
+
+    return Wire::build(_PIs[i]);
+}
+
+ref<PyObject>
+Netlist::get_PO(PyObject* o)
+{
+    uind i = Int_AsSsize_t(o);
+
+    if( i>=_POs.size() )
+    {
+        throw exception(PyExc_KeyError);
+    }
+
+    return Wire::build(_POs[i]);
+}
+
+ref<PyObject>
+Netlist::get_Flop(PyObject* o)
+{
+    uind i = Int_AsSsize_t(o);
+
+    if( i>=_Flops.size() )
+    {
+        throw exception(PyExc_KeyError);
+    }
+
+    return Wire::build(_Flops[i]);
+}
+
+ref<PyObject>
 Netlist::get_PIs()
 {
-    ZZ::Vec<ZZ::Wire> vec;
-
-    fill_gates(vec, N, ZZ::gate_PI);
-
-    return Vec<Wire>::build(vec);
+    return VecRef<Wire>::build(borrow(this), _PIs);
 }
 
 ref<PyObject>
 Netlist::get_POs()
 {
-    ZZ::Vec<ZZ::Wire> vec;
-
-    fill_gates(vec, N, ZZ::gate_PO);
-
-    return Vec<Wire>::build(vec);
+    return VecRef<Wire>::build(borrow(this), _POs);
 }
 
 ref<PyObject>
 Netlist::get_Flops()
 {
-    ZZ::Vec<ZZ::Wire> vec;
-
-    fill_gates(vec, N, ZZ::gate_Flop);
-
-    return Vec<Wire>::build(vec);
+    return VecRef<Wire>::build(borrow(this), _Flops);
 }
 
 ref<PyObject>

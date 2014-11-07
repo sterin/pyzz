@@ -45,6 +45,10 @@ public:
     ref<PyObject> n_fair_properties();
     ref<PyObject> n_fair_constraints();
 
+    ref<PyObject> get_PI(PyObject* o);
+    ref<PyObject> get_PO(PyObject* o);
+    ref<PyObject> get_Flop(PyObject* o);
+
     ref<PyObject> get_PIs();
     ref<PyObject> get_POs();
     ref<PyObject> get_Flops();
@@ -74,6 +78,10 @@ public:
 public:
 
     ZZ::Netlist N;
+
+    ZZ::Vec<ZZ::Wire> _PIs;
+    ZZ::Vec<ZZ::Wire> _POs;
+    ZZ::Vec<ZZ::Wire> _Flops;
 
 private:
 
