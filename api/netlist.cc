@@ -842,7 +842,6 @@ ref<PyObject>
 Netlist::copy()
 {
     ref<Netlist> CN = build();
-    CN->assure_pobs();
 
     ZZ::Netlist& M = CN->N;
 
@@ -918,6 +917,8 @@ Netlist::copy()
     {
         pyxlat->wmap(w) = M[xlat[w]];
     }
+
+    CN->assure_pobs();
 
     ref<PyObject> tuple = Tuple_New(2);
 
