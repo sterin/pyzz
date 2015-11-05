@@ -160,7 +160,7 @@ init()
     };
 
     borrowed_ref<PyObject> mod = InitModule3(
-        "pyzz._pyzz",
+        "_pyzz",
         pyzz_methods,
         "Python interface to ZZ and Bip"
         );
@@ -184,6 +184,12 @@ init()
     Netlist::initialize(mod);
     Solver::initialize(mod);
     Unroll::initialize(mod);
+}
+
+void zz_init()
+{
+    ZZ::zzInitialize();
+    init();
 }
 
 } // namespace pyzz

@@ -1,18 +1,10 @@
-#include <cstdio>
-
-namespace ZZ
-{
-    void zzInitialize(bool finalize=false);
-}
-
 namespace pyzz
 {
-    void init();
+    void zz_init();
 }
 
 extern "C"
 void init_pyzz()
 {
-    ZZ::zzInitialize();
-    pyzz::init();
+    pyzz::zz_init();
 }

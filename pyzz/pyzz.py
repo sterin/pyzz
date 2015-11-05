@@ -1,6 +1,7 @@
 import itertools
 
-from ._pyzz import *
+from _pyzz import *
+
 
 SAT_VALUES = [ 'UNKNOWN', 'ERROR', 'UNSAT', 'SAT']
 L_VALUES = [ 'l_Unknown', 'l_Error', 'l_False', 'l_True']
