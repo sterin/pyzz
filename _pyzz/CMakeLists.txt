@@ -1,12 +1,12 @@
 set(pyzz_sources
-    pyzzwrapper.cc
-    lit.cc
-    netlist.cc
-    solver.cc
-    unroll.cc
-    veciterator.cc
-    wire.cc
-    wmap.cc
+    pyzzwrapper.cpp
+    lit.cpp
+    netlist.cpp
+    solver.cpp
+    unroll.cpp
+    veciterator.cpp
+    wire.cpp
+    wmap.cpp
     _pyzz.cpp)
 
 python_add_module(_pyzz SHARED ${pyzz_sources})
