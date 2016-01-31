@@ -81,6 +81,8 @@ def print_cex( U, S, symbols, loop=None, filter=filter_underscore ):
 
 def simple_safety_bmc(N, bad, constr, max, start_frame, handle_sat, handle_unsat):
 
+    bad = disjunction(N, bad)
+
     U = unroll(N, init=True)
     S = solver(U.F)
 
@@ -91,7 +93,7 @@ def simple_safety_bmc(N, bad, constr, max, start_frame, handle_sat, handle_unsat
         fbad = U[bad, frame]
         S.cube( U[constr, frame] )
 
-        rc = S.solve( *fbad )
+        rc = S.solve( fbad )
 
         if rc == solver.SAT:
 
@@ -101,7 +103,7 @@ def simple_safety_bmc(N, bad, constr, max, start_frame, handle_sat, handle_unsat
         elif rc == solver.UNSAT:
 
             handle_unsat(U, S, frame)
-            S.cube( ~f for f in fbad )
+            S.cube( [~fbad] )
 
     return solver.UNDEF
 
