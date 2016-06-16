@@ -51,13 +51,8 @@ imc(PyObject* args, PyObject* kwds)
     }
     else
     {
-        ZZ::Vec<ZZ::Wire> pos;
-        fill_gates(pos, N.N, ZZ::gate_PO);
-
-        for(uind i=0; i<pos.size() ; i++)
-        {
-            props.push( ~pos[i] );
-        }
+        Get_Pob(N.N, properties);
+        properties.copyTo(props);
     }
 
     int buf_free_depth = -1;
@@ -110,13 +105,8 @@ pdr(PyObject* args, PyObject* kwds)
     }
     else
     {
-        ZZ::Vec<ZZ::Wire> pos;
-        fill_gates(pos, N.N, ZZ::gate_PO);
-
-        for(uind i=0; i<pos.size() ; i++)
-        {
-            props.push( ~pos[i] );
-        }
+        Get_Pob(N.N, properties);
+        properties.copyTo(props);
     }
 
     int buf_free_depth = -1;
