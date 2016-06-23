@@ -107,7 +107,7 @@ def simple_safety_bmc(N, bad, constr, max, start_frame, handle_sat, handle_unsat
 
     return solver.UNDEF
 
-def safety_bmc(N, max, symbols=None, filter=filter_underscore, cex=True, verbose=True):
+def safety_bmc(N, max, symbols=None, filter=filter_underscore, cex=True, verbose=True, print_cex=print_cex):
 
     if symbols is None:
         symbols = make_symbols(N)
