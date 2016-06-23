@@ -186,7 +186,7 @@ def pyzz_to_pyaig(N):
         xlat[ff] = aig.create_latch(init=lbool_to_init[flop_init[ff]])
 
     if N.n_Ands()>0:
-        for w in N.upOrder(N.get_Ands()):
+        for w in N.uporder(N.get_Ands()):
             if w.is_And():
                 xlat[w] = aig.create_and( xlat[w[0]], xlat[w[1]])
 
@@ -222,4 +222,4 @@ def pyzz_to_pyaig(N):
         if po not in all_prop_pos:
             aig.create_po(xlat_po(po), po_type=AIG.OUTPUT)
 
-    return aig
+    return aig, xlat
