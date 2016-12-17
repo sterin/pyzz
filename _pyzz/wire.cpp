@@ -19,6 +19,9 @@ Wire::tp_repr()
 {
     ZZ::String s;
     s += w;
+    s += "(";
+    s += w.nl();
+    s += ")";
 
     return String_FromString(s.c_str());
 }
