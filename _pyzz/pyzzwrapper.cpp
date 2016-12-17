@@ -12,6 +12,11 @@
 
 #include "ZZ_Bip.hh"
 
+#include <vector>
+
+extern "C" 
+unsigned Abc_TtCanonicize(void* pTruth, int nVars, char* pCanonPerm);
+
 namespace pyzz
 {
 
@@ -129,6 +134,46 @@ pdr(PyObject* args, PyObject* kwds)
     return BuildValue("ii", res.value, buf_free_depth);
 }
 
+template<typename T, typename F>
+ref<PyObject> to_list(const std::vector<T>& vec, F f)
+{
+    auto list = List_New(vec.size());
+
+    for(int i=0; i<vec.size(); i++)
+    {
+        List_SetItem(list, i, f(vec[i]));
+    }
+
+    return list;
+}
+
+
+ref<PyObject>
+abc_tt_canonize(PyObject* args, PyObject* kwargs)
+{
+    static char *kwlist[] = { "n", "d", NULL };
+
+    int N=0;
+    borrowed_ref<PyObject> pD;
+
+    Arg_ParseTupleAndKeywords(args, kwargs, "iO:abc_tt_canonize", kwlist, &N, &pD);
+
+    std::vector<std::uint32_t> words;
+
+    pywrapper_for_iterator(pD, pW)
+    {
+        words.push_back(Int_AsSsize_t(pW));
+    }
+
+    std::vector<char> perm(N);
+    unsigned mask = Abc_TtCanonicize(&words[0], N, &perm[0]);
+
+    auto tt = to_list(words, [&](std::uint32_t w){ return Int_FromLong(w);});
+    auto pp = to_list(perm, [&](char p){return Int_FromLong(p);});
+
+    return BuildValue("iOO", mask, tt.get(), pp.get());
+}
+
 void
 init()
 {
@@ -146,6 +191,7 @@ init()
     static PyMethodDef pyzz_methods[] = {
         PYTHONWRAPPER_FUNC_KEYWORDS(imc, 0, "interpolation-based model-checking"),
         PYTHONWRAPPER_FUNC_KEYWORDS(pdr, 0, "property-directed-reachability"),
+        PYTHONWRAPPER_FUNC_KEYWORDS(abc_tt_canonize, 0, "canonize truth table"),
         { 0 }
     };
 
