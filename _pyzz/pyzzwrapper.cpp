@@ -168,8 +168,8 @@ abc_tt_canonize(PyObject* args, PyObject* kwargs)
     std::vector<char> perm(N);
     unsigned mask = Abc_TtCanonicize(&words[0], N, &perm[0]);
 
-    auto tt = to_list(words, [&](std::uint32_t w){ return Int_FromLong(w);});
-    auto pp = to_list(perm, [&](char p){return Int_FromLong(p);});
+    auto tt = to_list(words, Int_FromLong(w));
+    auto pp = to_list(perm, Int_FromLong(p));
 
     return BuildValue("iOO", mask, tt.get(), pp.get());
 }
