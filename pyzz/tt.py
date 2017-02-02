@@ -18,6 +18,6 @@ def from_words(m, words):
     return tt
 
 
-def canonize(m, tt):
+def canonize(tt):
     mask, words, permutation = pyzz.abc_tt_canonize(tt.m.N, to_words(tt))
-    return mask, from_words(m, words), permutation 
+    return mask, from_words(tt.m, words), permutation 
