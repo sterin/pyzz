@@ -76,6 +76,8 @@ public:
     void remove_unreach();
     void remove_bufs();
 
+    void assure_pobs();
+
 public:
 
     ZZ::Netlist N;
@@ -86,7 +88,6 @@ public:
 
 private:
 
-    void assure_pobs();
     void ensure_netlist(ZZ::Wire w);
 
     void copy_props(ZZ::Netlist& M, const ZZ::WWMap& xlat);

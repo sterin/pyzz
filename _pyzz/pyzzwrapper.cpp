@@ -174,6 +174,34 @@ abc_tt_canonize(PyObject* args, PyObject* kwargs)
     return BuildValue("iOO", mask, tt.get(), pp.get());
 }
 
+ref<PyObject>
+marshal_netlist(PyObject* o)
+{
+    Netlist& N = Netlist::ensure(o);
+    
+    ZZ::Vec<uchar> data;
+    ZZ::streamOut_Netlist(data, N.N);
+
+    return ByteArray_FromStringAndSize(reinterpret_cast<const char*>(data.base()), data.size());
+}
+
+ref<PyObject>
+unmarshal_netlist(PyObject* o)
+{
+    if( ! ByteArray_Check(o) )
+    {
+        throw exception( PyExc_TypeError );        
+    }
+
+    const uchar* p = reinterpret_cast<const uchar*>( ByteArray_AsString(o) );
+
+    ref<Netlist> N = Netlist::build(true);
+    ZZ::streamIn_Netlist(p, p+ByteArray_Size(o), N->N);
+    N->assure_pobs();
+
+    return N;
+}
+
 void
 init()
 {
@@ -192,6 +220,8 @@ init()
         PYTHONWRAPPER_FUNC_KEYWORDS(imc, 0, "interpolation-based model-checking"),
         PYTHONWRAPPER_FUNC_KEYWORDS(pdr, 0, "property-directed-reachability"),
         PYTHONWRAPPER_FUNC_KEYWORDS(abc_tt_canonize, 0, "canonize truth table"),
+        PYTHONWRAPPER_FUNC_O(marshal_netlist, 0, "marshal netlist into a bytearray"),
+        PYTHONWRAPPER_FUNC_O(unmarshal_netlist, 0, "unmarshal netlist from a bytearray"),
         { 0 }
     };
 
