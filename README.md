@@ -1,6 +1,6 @@
 # pyzz
 
-`pyzz` is a python interface for [ABC/ZZ](https://bitbucket.org/niklaseen/abc-zz)
+`pyzz` is a python interface for [ABC/ZZ](https://github.com/berkeley-abc/abc-zz)
 
 # Usage
 
@@ -189,86 +189,90 @@ Functions for compositions:
 
 A simple example that writes an AIG with to PIs, and the PO is the AND of these two PIs:
 
-    :::python
-    from pyzz import *
-    
-    N = netlist() # construct a netlist
-    
-    w1 = N.add_PI() # create a new PI
-    w2 = N.add_PI() # create a new PI
+```python
+from pyzz import *
 
-    po1 = N.add_PO() # create a new PO
-    po1[0] = w1 & w2 # set the fanin of the PO to w1&w2
+N = netlist() # construct a netlist
 
-    po2 = N.add_PO(fanin=w1&w2) # similar to above, but sets the fanin during construction
+w1 = N.add_PI() # create a new PI
+w2 = N.add_PI() # create a new PI
 
-    N.write_aiger('test1.aig')
+po1 = N.add_PO() # create a new PO
+po1[0] = w1 & w2 # set the fanin of the PO to w1&w2
+
+po2 = N.add_PO(fanin=w1&w2) # similar to above, but sets the fanin during construction
+
+N.write_aiger('test1.aig')
+```
 
 Another example, but this time using utility functions:
 
-    :::python
-    from pyzz import *
-    
-    N = netlist() # construct a netlist
-    
-    wires = [ N.add_PI() for _ in xrange(10) ] # create 10 new PIs
+```python
+from pyzz import *
 
-    po2 = N.add_PO(fanin=conjunction(N, wires)) # creates a new PO whose fanin is the conjunction of all the PIs
-    
-    N.write_aiger('test2.aig')
+N = netlist() # construct a netlist
+
+wires = [ N.add_PI() for _ in xrange(10) ] # create 10 new PIs
+
+po2 = N.add_PO(fanin=conjunction(N, wires)) # creates a new PO whose fanin is the conjunction of all the PIs
+
+N.write_aiger('test2.aig')
+```
 
 A simple combinational equivalence checker:
 
-    :::python
-    def build_miters(N1, N2):
+```python
+def build_miters(N1, N2):
 
-        N, (xlat1, xlat2) = pyzz.combine_cones(N1, N2)
+    N, (xlat1, xlat2) = pyzz.combine_cones(N1, N2)
 
-        N1_pos = [ xlat1[po[0]] for po in N1.get_POs() ]
-        N2_pos = [ xlat2[po[0]] for po in N2.get_POs() ]
+    N1_pos = [ xlat1[po[0]] for po in N1.get_POs() ]
+    N2_pos = [ xlat2[po[0]] for po in N2.get_POs() ]
 
-        return N, [ f1^f2 for f1, f2 in zip(N1_pos, N2_pos) ]
+    return N, [ f1^f2 for f1, f2 in zip(N1_pos, N2_pos) ]
 
-    def CEC(N1, N2):
+def CEC(N1, N2):
 
-        # build miters for the POs
-        N, miters = build_miters(N1, N2)
+    # build miters for the POs
+    N, miters = build_miters(N1, N2)
 
-        S = pyzz.solver(N)
+    S = pyzz.solver(N)
 
-        for i, f in enumerate(miters):
+    for i, f in enumerate(miters):
 
-            rc = S.solve(f)
+        rc = S.solve(f)
 
-            if rc==pyzz.solver.UNSAT:
-                print 'Output %d is equivalent'%i
-            elif rc==pyzz.solver.SAT:
-                print 'Output %d is not equivalent'%i
-            else:
-                print 'Could not prove output %d'%i
+        if rc==pyzz.solver.UNSAT:
+            print 'Output %d is equivalent'%i
+        elif rc==pyzz.solver.SAT:
+            print 'Output %d is not equivalent'%i
+        else:
+            print 'Could not prove output %d'%i
+```
 
 A simple BMC
 
-    :::python
-    def bmc(N, max):
-    
-        # create an unroll object with the Flops initialized in the first frame
-        U = unroll(N, init=True)
-    
-        # create a solver of the unrolled netlist
-        S = solver(U.F)
-    
-        prop = conjunction( N, N.get_properties() ) # conjunction of the properties
-        constr = conjunction( N, N.get_constraints() ) # conjunction of the constraints
-    
-        for i in xrange(max):
-    
-            fprop = U[prop, i] # unroll prop to frame i
-            S.cube( U[constr, i] ) # unroll the constraits to frame i
-    
-            rc = S.solve( ~prop ) # run the solver
-    
-            if rc == solver.SAT:
-                return solver.SAT
-    
-        return solver.UNDEF
+```python
+def bmc(N, max):
+
+    # create an unroll object with the Flops initialized in the first frame
+    U = unroll(N, init=True)
+
+    # create a solver of the unrolled netlist
+    S = solver(U.F)
+
+    prop = conjunction( N, N.get_properties() ) # conjunction of the properties
+    constr = conjunction( N, N.get_constraints() ) # conjunction of the constraints
+
+    for i in xrange(max):
+
+        fprop = U[prop, i] # unroll prop to frame i
+        S.cube( U[constr, i] ) # unroll the constraits to frame i
+
+        rc = S.solve( ~prop ) # run the solver
+
+        if rc == solver.SAT:
+            return solver.SAT
+
+    return solver.UNDEF
+```
