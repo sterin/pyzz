@@ -1,4 +1,5 @@
 from pyzz import *
+print dir()
 
 def bmc(N, max, symbols, filter=lambda sym: True, cex=True):
 
@@ -34,6 +35,6 @@ def bmc(N, max, symbols, filter=lambda sym: True, cex=True):
 
 if __name__ == "__main__":
     
-    N, symbols = arg_netlist("aiger/intel038.aig")
+    N, symbols = utils.arg_netlist("aiger/intel038.aig")
 
     print bmc( N , 40, symbols)

@@ -1,5 +1,3 @@
-#!/home/sterin/workspaces/dev/ZZ/Baruch/pyzz_quick
-
 import time
 import sys
 import optparse
