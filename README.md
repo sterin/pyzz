@@ -93,11 +93,14 @@ I the wire is a PO, its fanin in can be accessed using
 
 * `w[0]`: returns the fanin of the PO
 * `w[0]=u`: sets the fanin of the PO
+* `w[0]^sign(w)`: return the fanin of the PO with the correct polarity (e.g. if w may be negated)
 
 If the wire is a Flop, its next-state function can accessed using
 
 * `w[0]`: returns the next-state function of the Flop
 * `w[0]=u`: sets the next-state function of the Flop
+* `w[0]^sign(w)`: return the fanin of the Flop with the correct polarity (e.g. if w may be negated)
+
 
 ## Solver
 
@@ -231,6 +234,7 @@ def build_miters(N1, N2):
 
     return N, [ f1^f2 for f1, f2 in zip(N1_pos, N2_pos) ]
 
+
 def CEC(N1, N2):
 
     # build miters for the POs
@@ -262,17 +266,20 @@ def bmc(N, max):
     S = solver(U.F)
 
     prop = conjunction( N, N.get_properties() ) # conjunction of the properties
-    constr = conjunction( N, N.get_constraints() ) # conjunction of the constraints
+    constr = N.get_constraints() # constraints
 
     for i in xrange(max):
+        print "Frame:", i
 
         fprop = U[prop, i] # unroll prop to frame i
         S.cube( U[constr, i] ) # unroll the constraits to frame i
 
-        rc = S.solve( ~prop ) # run the solver
+        rc = S.solve( ~fprop ) # run the solver
 
         if rc == solver.SAT:
+            print "SAT"
             return solver.SAT
 
+    print "UNDEF"
     return solver.UNDEF
 ```
