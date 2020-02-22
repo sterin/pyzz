@@ -16,9 +16,11 @@ public:
 
     static void initialize(PyObject* module);
 
+    static ref<PyObject> unflatten_aiger(PyObject* o);
     static ref<PyObject> read_aiger(PyObject* o);
     static ref<PyObject> read(PyObject* o);
 
+    ref<PyObject> flatten_aiger();
     void write_aiger(PyObject* args);
     void write(PyObject* args);
 

@@ -262,9 +262,11 @@ Netlist::initialize(PyObject* module)
 {
     static PyMethodDef methods[] = {
 
+        PYTHONWRAPPER_METH_O( Netlist, unflatten_aiger, METH_STATIC, ""),
         PYTHONWRAPPER_METH_O( Netlist, read_aiger, METH_STATIC, ""),
         PYTHONWRAPPER_METH_O( Netlist, read, METH_STATIC, ""),
 
+        PYTHONWRAPPER_METH_NOARGS( Netlist, flatten_aiger, 0, ""),
         PYTHONWRAPPER_METH_O( Netlist, write_aiger, 0, ""),
         PYTHONWRAPPER_METH_O( Netlist, write, 0, ""),
 
@@ -341,6 +343,26 @@ Netlist::initialize(PyObject* module)
 }
 
 ref<PyObject>
+Netlist::unflatten_aiger(PyObject* o)
+{
+    if( ! Object_CheckBuffer(o) )
+    {
+        throw exception( PyExc_TypeError, "expected an object that supports the buffer interface" );
+    }
+
+    ref<PyObject> mv = MemoryView_GetContiguous(o, PyBUF_READ, 'C');
+    Py_buffer* buf = MemoryView_GET_BUFFER(mv);
+
+    ZZ::In in{reinterpret_cast<cchar*>(buf->buf), static_cast<uind>(buf->len), false};
+    ref<Netlist> NN = Netlist::build(true);
+    
+    ZZ::readAiger(in, NN->N);
+    NN->assure_pobs();
+    
+    return NN;
+}
+
+ref<PyObject>
 Netlist::read_aiger(PyObject* o)
 {
     ref<Netlist> NN = Netlist::build(true);
@@ -356,6 +378,16 @@ Netlist::read(PyObject* o)
     NN->N.read( String_AsString(o) );
     NN->assure_pobs();
     return NN;
+}
+
+ref<PyObject>
+Netlist::flatten_aiger()
+{
+    ZZ::Out out;
+    writeAiger(out, N, ZZ::Array<uchar>());
+
+    ZZ::Vec<char>& data = out.vec();
+    return ByteArray_FromStringAndSize(data.base(), data.size());
 }
 
 void
