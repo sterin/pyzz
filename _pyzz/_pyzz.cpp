@@ -1,10 +1,12 @@
+#include "pywrapper.h"
+
 namespace pyzz
 {
     void zz_init();
 }
 
-extern "C"
-void init_pyzz()
+PyMODINIT_FUNC 
+init_pyzz()
 {
     pyzz::zz_init();
 }
